@@ -1,0 +1,22 @@
+# AGENTS.md
+
+- Domain has no framework dependencies; Application depends only on Domain.
+- Infrastructure implements persistence and security ports; API is the composition root.
+- Commands change state; queries use no-tracking projections.
+- Use UTC through `IClock`; never use `DateTime.Now`.
+- Keep message ordering per conversation; never add a global ordering identity.
+- Do not log secrets, tokens, credentials, cookies, or message bodies.
+- Build: `dotnet build server/Messenger.sln -c Release`.
+- Test: `dotnet test server/Messenger.sln` (integration tests need Docker for Testcontainers).
+- Client: `cd client && npm run lint && npm test -- --run && npm run build`.
+- E2E: start the stack, then `cd e2e && npx playwright test`.
+- Local dependencies: `docker compose up -d postgres mailpit`.
+- Seed demo data: `dotnet run --project server/src/Messenger.Api --launch-profile http -- seed`.
+- New migration: `dotnet ef migrations add <Name> --project server/src/Messenger.Infrastructure --startup-project server/src/Messenger.Infrastructure --output-dir Persistence/Migrations`.
+- Every request that touches a conversation or message implements `IConversationMemberRequest` / `IMessageAccessRequest` so the authorization behavior checks membership (BOLA).
+- Domain events are published only after commit; handler failures must not roll back data.
+- Messages render as plain text in the client; `dangerouslySetInnerHTML` is banned by ESLint.
+- UI text never goes inline in components: add the key to both `client/src/i18n/locales/uk.json` and `en.json` (a test enforces parity) and use `useT()`.
+- New user-facing server messages (errors, validation) are written in English in Domain/Application and get a Ukrainian entry in `server/src/Messenger.Api/Resources/ApiMessages.uk.resx` (English is the neutral resource).
+- Visual changes go through the tokens in `client/src/styles/theme.css` (Neumorphism, light + dark).
+- Update `docs/ASSUMPTIONS.md` for every unspecified decision.

@@ -1,0 +1,8 @@
+# Development-only defaults (local docker-compose password, dev JWT fallback, demo seed password) are not real credentials.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local development defaults"
+paths = ['''server/src/Messenger.Api/appsettings\.Development\.json''', '''docker-compose\.yml''', '''\.env\.example''']
+regexes = ['''development-only-secret-change-me-0123456789abcdef''']

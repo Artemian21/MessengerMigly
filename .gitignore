@@ -1,0 +1,23 @@
+.env
+.env.*
+!.env.example
+**/bin/
+**/obj/
+client/node_modules/
+client/dist/
+appsettings.*.local.json
+.scaffold-backup/
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+**/TestResults/
+server/.vs/
+.vs/
+# Generated / local-only
+*.tsbuildinfo
+node_modules/
+.claude/
+*.lnk
+# Stray files from the original scaffold at the repository root (the real client lives in client/)
+/package.json
+/package-lock.json

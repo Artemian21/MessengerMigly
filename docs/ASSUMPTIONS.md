@@ -1,0 +1,42 @@
+# Assumptions
+
+Decisions the specification left open, each with the reason. Newest at the bottom.
+
+- **.NET 9** is used because it is the SDK installed on the build machine and in CI; moving to .NET 10 LTS is a target-framework change.
+- **Controllers + MediatR 12.4.1** (Apache 2.0) are used; MediatR ≥ 13 is not (licence, P-04).
+- The Application project references **`Microsoft.EntityFrameworkCore`** (not Npgsql) so read-side handlers can use `IQueryable` + `AsNoTracking`/`ToListAsync` through `IApplicationDbContext`; it has no project reference except Domain (checked by architecture tests).
+- Message search uses **`LIKE` on `lower(body)`** with a GIN trigram index on `lower(body)`, instead of Npgsql's `ILIKE`, to keep the Application layer provider-agnostic. Same case-insensitive behaviour, still index-assisted.
+- **`Result`/`Error` types live in Domain** (no framework dependency) so domain methods can return typed failures; the API maps them to ProblemDetails.
+- Missing access to a conversation or message is reported as **404**, not 403, so outsiders cannot probe ids (BOLA). Author-only actions inside a visible conversation (edit, history, info) return **403**.
+- **Lockout** after 5 failed logins for 15 minutes is answered with **429 + Retry-After** (the spec lists 429 for brute-force protection).
+- **Wrong current password** on change-password / delete-account returns **422** with a field error, not 401, so the SPA does not treat it as an expired session.
+- Registration with an **already used email** returns 202 and re-sends verification if that account is unverified; a **taken username** returns 409 (usernames are public anyway).
+- **Unverified users can log in only after confirming email** (`Auth:RequireEmailVerification=true`); tests and local setups may turn it off.
+- Refresh **grace window = 20 s**: a rotated cookie presented again within it returns an access token but no new cookie (the browser already holds the new cookie). Outside the window it revokes the family.
+- Sessions = refresh-token families. **Access tokens are not checked against revocation** on every request (no DB hit); they expire within 12 minutes, and the hub closes connections when the token expires.
+- A participant who **left or was removed** loses read access to the group (history stays for the others). Re-adding them starts a new visibility watermark.
+- A **deleted group** stays readable for its members; sending, renaming and membership changes return 409.
+- Sending to a direct chat whose **peer deleted their account** returns 409 `peer_deleted`.
+- **Display names**: live accounts show their current display name; deleted accounts show the snapshot taken at send time (P-08 / OQ-06).
+- **Message length** is counted in user-perceived characters (grapheme clusters), so an emoji counts as one. Line breaks and tabs are allowed; other control and Unicode format characters (e.g. bidi overrides) are rejected, except ZWJ used by emoji.
+- **Typing** is delivered only to members who have the conversation open (`OpenConversation` group), as specified; the chat list shows typing only for chats that are open in another view.
+- **Web Push payload never contains the message body**, only "New message" and the sender/group name, to keep bodies out of third-party push services.
+- **GitHub email is not treated as verified** for account linking (the OAuth handler does not expose the `verified` flag); only Google's `email_verified` allows auto-merge by email (P-18).
+- OAuth sign-up creates the user with a temporary `user_xxxxxxxx` username and `NeedsProfile=true`; the SPA forces the onboarding screen until a username is chosen.
+- **Rate limits**: production defaults 60/min/IP global, 10/min/IP on auth endpoints, token bucket 10 burst + 30/min per user for sending. Development raises the global limit to 300/min because Vite HMR and the SPA reload often. `/health` is not rate limited.
+- **Attachment metadata** (name, size ≤ 100 MB, MIME type, max 10 per message) is stored; no file upload or storage (OQ-09).
+- **Seed password** comes from `Seed:Password`; Development sets a demo value in `appsettings.Development.json` (local only, not a real credential).
+- The API **applies migrations at startup** under `pg_advisory_lock` (`Database:MigrateOnStartup`, default true).
+- Ids are **GUID v7** generated in the domain; EF is configured with `ValueGeneratedNever` so new child entities are inserted, not updated.
+- **Presence** grace before going offline is 7 s (configurable); one `LastSeenAt` write per final disconnect.
+- The previous scaffold files were **moved to `.scaffold-backup/`** instead of being deleted (deleting was not permitted in this environment). The folder is git-ignored and can be removed.
+- **UI languages are Ukrainian (default) and English**, as requested (Russian was removed). The first visit follows `navigator.language` (`en*` → English, otherwise Ukrainian) and the choice is stored in `localStorage`. The API supports `en` and `uk` and falls back to English for any other `Accept-Language`.
+- **Client i18n is a small in-house module** (`client/src/i18n`) over JSON resource files instead of a library: the app only needs lookup, `{param}` interpolation and plural forms (`Intl.PluralRules`), and this keeps the bundle small. Switching the language re-mounts the routed tree so memoised views pick up the new strings.
+- **Server messages are translated at the API boundary** with `.resx` files whose resource names are the English texts (gettext style). Domain/Application keep producing English, so no localization dependency leaks inward; unknown texts fall back to English. FluentValidation's built-in messages localize themselves from the request culture. Email texts live in `Messenger.Application/Resources/EmailTexts.*.resx` (plain `ResourceManager`, BCL only).
+- **Demo seed conversations stay in English** (user-generated content is not translated).
+- **Theme changed from IRC-90s to Neumorphism** at the user's request; it has light and dark variants driven by `prefers-color-scheme`.
+- The CSP allows `style-src 'unsafe-inline'` because React sets inline `style` attributes; scripts stay `'self'` only. `/docs` (Scalar) is exempt from the CSP.
+- **Product name is Migly** (renamed from Greenline at the user's request). Code namespaces and project names stay `Messenger.*`, the Docker image/database stay `messenger`. Demo accounts are `@migly.local` and the Development seed password is `Migly-demo-2026`; a local database seeded before the rename keeps the old `@greenline.local` accounts and password until it is reset.
+- **Module documentation** lives in `docs/documentation/` and is written in English, like the README and code comments, as required by the specification.
+- **`docs/GIT_WORKFLOW.md` is written in Ukrainian** because it is an internal process document for the two-person team (the other docs stay English, as the specification requires). The team has two people (backend/delivery and frontend/E2E); `OWNERSHIP.md` was reduced from three roles accordingly.
+- Stray root-level `package.json`, `package-lock.json` and `node_modules/` from the original scaffold are git-ignored and not part of the project.
