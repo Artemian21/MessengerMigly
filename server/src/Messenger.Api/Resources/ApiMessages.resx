@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="One or more validation errors occurred." xml:space="preserve"><value>One or more validation errors occurred.</value></data>
+  <data name="{0} was not found." xml:space="preserve"><value>{0} was not found.</value></data>
+  <data name="Conversation" xml:space="preserve"><value>Conversation</value></data>
+  <data name="Message" xml:space="preserve"><value>Message</value></data>
+  <data name="User" xml:space="preserve"><value>User</value></data>
+  <data name="Member" xml:space="preserve"><value>Member</value></data>
+  <data name="Session" xml:space="preserve"><value>Session</value></data>
+  <data name="Provider" xml:space="preserve"><value>Provider</value></data>
+  <data name="Push notifications" xml:space="preserve"><value>Push notifications</value></data>
+  <data name="You are not allowed to perform this action." xml:space="preserve"><value>You are not allowed to perform this action.</value></data>
+  <data name="Authentication is required." xml:space="preserve"><value>Authentication is required.</value></data>
+  <data name="This link has already been used." xml:space="preserve"><value>This link has already been used.</value></data>
+  <data name="This link has expired." xml:space="preserve"><value>This link has expired.</value></data>
+  <data name="This link is invalid." xml:space="preserve"><value>This link is invalid.</value></data>
+  <data name="Invalid email or password." xml:space="preserve"><value>Invalid email or password.</value></data>
+  <data name="Your session has expired. Please sign in again." xml:space="preserve"><value>Your session has expired. Please sign in again.</value></data>
+  <data name="Please confirm your email address before signing in." xml:space="preserve"><value>Please confirm your email address before signing in.</value></data>
+  <data name="This account has been suspended." xml:space="preserve"><value>This account has been suspended.</value></data>
+  <data name="Too many failed sign-in attempts. Try again later." xml:space="preserve"><value>Too many failed sign-in attempts. Try again later.</value></data>
+  <data name="This username is already taken." xml:space="preserve"><value>This username is already taken.</value></data>
+  <data name="Message must not be empty." xml:space="preserve"><value>Message must not be empty.</value></data>
+  <data name="Message must be at most 4000 characters." xml:space="preserve"><value>Message must be at most 4000 characters.</value></data>
+  <data name="Message contains forbidden control characters." xml:space="preserve"><value>Message contains forbidden control characters.</value></data>
+  <data name="Display name must be 1-64 characters." xml:space="preserve"><value>Display name must be 1-64 characters.</value></data>
+  <data name="Display name contains forbidden control characters." xml:space="preserve"><value>Display name contains forbidden control characters.</value></data>
+  <data name="Username must be 3-32 characters: a-z, 0-9, '_' or '.'." xml:space="preserve"><value>Username must be 3-32 characters: a-z, 0-9, '_' or '.'.</value></data>
+  <data name="Password must be at least 10 characters." xml:space="preserve"><value>Password must be at least 10 characters.</value></data>
+  <data name="Password must be at most 72 bytes." xml:space="preserve"><value>Password must be at most 72 bytes.</value></data>
+  <data name="Group title must be 1-100 characters." xml:space="preserve"><value>Group title must be 1-100 characters.</value></data>
+  <data name="Group title contains forbidden control characters." xml:space="preserve"><value>Group title contains forbidden control characters.</value></data>
+  <data name="Email is required." xml:space="preserve"><value>Email is required.</value></data>
+  <data name="Email is not valid." xml:space="preserve"><value>Email is not valid.</value></data>
+  <data name="Password is required." xml:space="preserve"><value>Password is required.</value></data>
+  <data name="Username is required." xml:space="preserve"><value>Username is required.</value></data>
+  <data name="Display name is required." xml:space="preserve"><value>Display name is required.</value></data>
+  <data name="Group title is required." xml:space="preserve"><value>Group title is required.</value></data>
+  <data name="Token is required." xml:space="preserve"><value>Token is required.</value></data>
+  <data name="A group needs at least 3 members including you." xml:space="preserve"><value>A group needs at least 3 members including you.</value></data>
+  <data name="A group can have at most 200 members." xml:space="preserve"><value>A group can have at most 200 members.</value></data>
+  <data name="Only the author can edit a message." xml:space="preserve"><value>Only the author can edit a message.</value></data>
+  <data name="Only the author can delete a message." xml:space="preserve"><value>Only the author can delete a message.</value></data>
+  <data name="A deleted message cannot be edited." xml:space="preserve"><value>A deleted message cannot be edited.</value></data>
+  <data name="Messages can only be edited within 48 hours." xml:space="preserve"><value>Messages can only be edited within 48 hours.</value></data>
+  <data name="Only groups can be left. Clear a personal chat instead." xml:space="preserve"><value>Only groups can be left. Clear a personal chat instead.</value></data>
+  <data name="Only personal chats can be cleared. Leave a group instead." xml:space="preserve"><value>Only personal chats can be cleared. Leave a group instead.</value></data>
+  <data name="This action is only available in groups." xml:space="preserve"><value>This action is only available in groups.</value></data>
+  <data name="This group has been deleted." xml:space="preserve"><value>This group has been deleted.</value></data>
+  <data name="You cannot remove this member." xml:space="preserve"><value>You cannot remove this member.</value></data>
+  <data name="Ownership cannot be assigned directly." xml:space="preserve"><value>Ownership cannot be assigned directly.</value></data>
+  <data name="The owner's role cannot be changed." xml:space="preserve"><value>The owner's role cannot be changed.</value></data>
+  <data name="Current password is incorrect." xml:space="preserve"><value>Current password is incorrect.</value></data>
+  <data name="Password is incorrect." xml:space="preserve"><value>Password is incorrect.</value></data>
+  <data name="Administrator role required." xml:space="preserve"><value>Administrator role required.</value></data>
+  <data name="Administrators cannot be suspended." xml:space="preserve"><value>Administrators cannot be suspended.</value></data>
+  <data name="You cannot suspend your own account." xml:space="preserve"><value>You cannot suspend your own account.</value></data>
+  <data name="An account with this email already exists. Sign in with your password and link the provider in settings." xml:space="preserve"><value>An account with this email already exists. Sign in with your password and link the provider in settings.</value></data>
+  <data name="The provider did not share a usable email address." xml:space="preserve"><value>The provider did not share a usable email address.</value></data>
+  <data name="This provider account is linked to another user." xml:space="preserve"><value>This provider account is linked to another user.</value></data>
+  <data name="Search text must be 2-64 characters." xml:space="preserve"><value>Search text must be 2-64 characters.</value></data>
+  <data name="Search text must be 2-200 characters." xml:space="preserve"><value>Search text must be 2-200 characters.</value></data>
+  <data name="Use either 'before' or 'after', not both." xml:space="preserve"><value>Use either 'before' or 'after', not both.</value></data>
+  <data name="Only the author can see the edit history." xml:space="preserve"><value>Only the author can see the edit history.</value></data>
+  <data name="Only the author can see message info." xml:space="preserve"><value>Only the author can see message info.</value></data>
+  <data name="Acknowledge at most 200 messages at once." xml:space="preserve"><value>Acknowledge at most 200 messages at once.</value></data>
+  <data name="Add at most 50 users at once." xml:space="preserve"><value>Add at most 50 users at once.</value></data>
+  <data name="Choose at least one user." xml:space="preserve"><value>Choose at least one user.</value></data>
+  <data name="Role must be 'Admin' or 'Member'." xml:space="preserve"><value>Role must be 'Admin' or 'Member'.</value></data>
+  <data name="Some users do not exist or cannot be added." xml:space="preserve"><value>Some users do not exist or cannot be added.</value></data>
+  <data name="clientMessageId is required." xml:space="preserve"><value>clientMessageId is required.</value></data>
+  <data name="You cannot start a chat with yourself." xml:space="preserve"><value>You cannot start a chat with yourself.</value></data>
+  <data name="This clientMessageId was already used in another conversation." xml:space="preserve"><value>This clientMessageId was already used in another conversation.</value></data>
+  <data name="This conversation has been deleted." xml:space="preserve"><value>This conversation has been deleted.</value></data>
+  <data name="This account has been deleted." xml:space="preserve"><value>This account has been deleted.</value></data>
+  <data name="The message you are replying to is not available." xml:space="preserve"><value>The message you are replying to is not available.</value></data>
+  <data name="At most 10 attachments are allowed." xml:space="preserve"><value>At most 10 attachments are allowed.</value></data>
+  <data name="File name is not valid." xml:space="preserve"><value>File name is not valid.</value></data>
+  <data name="Content type is not valid." xml:space="preserve"><value>Content type is not valid.</value></data>
+  <data name="Endpoint must be an absolute https URL." xml:space="preserve"><value>Endpoint must be an absolute https URL.</value></data>
+  <data name="Check your inbox to confirm your email address." xml:space="preserve"><value>Check your inbox to confirm your email address.</value></data>
+  <data name="If the address can receive email, a message is on its way." xml:space="preserve"><value>If the address can receive email, a message is on its way.</value></data>
+  <data name="Cross-site request rejected." xml:space="preserve"><value>Cross-site request rejected.</value></data>
+  <data name="No API endpoint matches this path." xml:space="preserve"><value>No API endpoint matches this path.</value></data>
+  <data name="Rate limit exceeded. Retry after the time given in the Retry-After header." xml:space="preserve"><value>Rate limit exceeded. Retry after the time given in the Retry-After header.</value></data>
+  <data name="The service is temporarily unavailable. Please retry shortly." xml:space="preserve"><value>The service is temporarily unavailable. Please retry shortly.</value></data>
+  <data name="The resource was modified concurrently. Please retry." xml:space="preserve"><value>The resource was modified concurrently. Please retry.</value></data>
+  <data name="An unexpected error occurred." xml:space="preserve"><value>An unexpected error occurred.</value></data>
+  <data name="Request body is not valid JSON." xml:space="preserve"><value>Request body is not valid JSON.</value></data>
+  <data name="The {0} field is required." xml:space="preserve"><value>The {0} field is required.</value></data>
+  <data name="Bad request" xml:space="preserve"><value>Bad request</value></data>
+  <data name="Unauthorized" xml:space="preserve"><value>Unauthorized</value></data>
+  <data name="Forbidden" xml:space="preserve"><value>Forbidden</value></data>
+  <data name="Not found" xml:space="preserve"><value>Not found</value></data>
+  <data name="Conflict" xml:space="preserve"><value>Conflict</value></data>
+  <data name="Gone" xml:space="preserve"><value>Gone</value></data>
+  <data name="Validation failed" xml:space="preserve"><value>Validation failed</value></data>
+  <data name="Too many requests" xml:space="preserve"><value>Too many requests</value></data>
+  <data name="Service unavailable" xml:space="preserve"><value>Service unavailable</value></data>
+  <data name="Server error" xml:space="preserve"><value>Server error</value></data>
+  <data name="Search text contains forbidden control characters." xml:space="preserve"><value>Search text contains forbidden control characters.</value></data>
+</root>
