@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Greeting" xml:space="preserve"><value>Вітаємо, {0}!</value></data>
+  <data name="Signature" xml:space="preserve"><value>— Migly</value></data>
+  <data name="VerifySubject" xml:space="preserve"><value>Підтвердьте акаунт Migly</value></data>
+  <data name="VerifyIntro" xml:space="preserve"><value>Вітаємо в Migly! Підтвердьте email, щоб почати спілкування:</value></data>
+  <data name="VerifyAction" xml:space="preserve"><value>Підтвердити email</value></data>
+  <data name="VerifyFooter" xml:space="preserve"><value>Посилання дійсне 24 години.</value></data>
+  <data name="ResetSubject" xml:space="preserve"><value>Скидання пароля Migly</value></data>
+  <data name="ResetIntro" xml:space="preserve"><value>Хтось запросив скидання вашого пароля в Migly. Якщо це були ви, скористайтеся посиланням:</value></data>
+  <data name="ResetAction" xml:space="preserve"><value>Скинути пароль</value></data>
+  <data name="ResetFooter" xml:space="preserve"><value>Якщо ви цього не робили, просто проігноруйте лист — пароль не зміниться.</value></data>
+</root>

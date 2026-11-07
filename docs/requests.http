@@ -1,0 +1,173 @@
+### Migly API request collection (VS Code REST Client / JetBrains HTTP client)
+# 1) Run "register", open Mailpit (http://localhost:8025), copy the token into @verifyToken, run "verify".
+# 2) Run "login" and copy accessToken into @token (or use the seeded alice@migly.local account).
+
+@baseUrl = http://localhost:5000
+@token = paste-access-token-here
+@verifyToken = paste-token-from-email
+@peerId = 00000000-0000-0000-0000-000000000000
+@conversationId = 00000000-0000-0000-0000-000000000000
+@messageId = 00000000-0000-0000-0000-000000000000
+
+### Health (no auth)
+GET {{baseUrl}}/health
+
+### Readiness (checks the database)
+GET {{baseUrl}}/health/ready
+
+### Register → 202
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{"email":"alice@example.com","password":"S3cure-pass-123","username":"alice","displayName":"Alice"}
+
+### Verify email → 204 (400 unknown token, 410 used/expired)
+POST {{baseUrl}}/api/v1/auth/verify-email
+Content-Type: application/json
+
+{"token":"{{verifyToken}}"}
+
+### Login → 200 {accessToken, expiresAt, user} + HttpOnly refresh cookie
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{"email":"alice@example.com","password":"S3cure-pass-123"}
+
+### Wrong password → 401 with a generic message
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{"email":"alice@example.com","password":"wrong-password"}
+
+### Refresh (cookie + CSRF header) → 200 and a rotated cookie
+POST {{baseUrl}}/api/v1/auth/refresh
+X-Requested-With: XMLHttpRequest
+
+### Me → 200
+GET {{baseUrl}}/api/v1/users/me
+Authorization: Bearer {{token}}
+
+### Me without token → 401
+GET {{baseUrl}}/api/v1/users/me
+
+### Update display name
+PATCH {{baseUrl}}/api/v1/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"displayName":"Alice from room 412"}
+
+### Search users (prefix, min 2 chars) → {items,total,next}
+GET {{baseUrl}}/api/v1/users?q=bo&limit=10&offset=0
+Authorization: Bearer {{token}}
+
+### My conversations
+GET {{baseUrl}}/api/v1/conversations
+Authorization: Bearer {{token}}
+
+### Personal chat with a user (404 = no chat yet)
+GET {{baseUrl}}/api/v1/conversations/direct/{{peerId}}
+Authorization: Bearer {{token}}
+
+### First personal message (creates the chat) → 201; same clientMessageId again → 200, no duplicate
+POST {{baseUrl}}/api/v1/conversations/direct/{{peerId}}/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"clientMessageId":"0192f0c4-7d4e-7a3b-9f10-3c2a1b0e9d11","body":"Hey, are you ready for class?"}
+
+### Send to a conversation → 201
+POST {{baseUrl}}/api/v1/conversations/{{conversationId}}/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"clientMessageId":"0192f0c4-7d4e-7a3b-9f10-3c2a1b0e9d13","body":"On my way","replyToMessageId":null,"attachments":[{"fileName":"notes.pdf","sizeBytes":48213,"contentType":"application/pdf"}]}
+
+### Empty message → 422 with errors.body
+POST {{baseUrl}}/api/v1/conversations/{{conversationId}}/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"clientMessageId":"0192f0c4-7d4e-7a3b-9f10-3c2a1b0e9d14","body":"   "}
+
+### History: newest page, then older with before=<sequence>, resync with after=<sequence>
+GET {{baseUrl}}/api/v1/conversations/{{conversationId}}/messages?limit=20
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/v1/conversations/{{conversationId}}/messages?before=20&limit=20
+Authorization: Bearer {{token}}
+
+###
+GET {{baseUrl}}/api/v1/conversations/{{conversationId}}/messages?after=0
+Authorization: Bearer {{token}}
+
+### Edit my message (≤ 48 h)
+PATCH {{baseUrl}}/api/v1/messages/{{messageId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"body":"On my way, 5 minutes"}
+
+### Edit history (author only)
+GET {{baseUrl}}/api/v1/messages/{{messageId}}/history
+Authorization: Bearer {{token}}
+
+### Delivery / read info (author only)
+GET {{baseUrl}}/api/v1/messages/{{messageId}}/info
+Authorization: Bearer {{token}}
+
+### Delete (tombstone) → 204
+DELETE {{baseUrl}}/api/v1/messages/{{messageId}}
+Authorization: Bearer {{token}}
+
+### Mark read up to a sequence
+POST {{baseUrl}}/api/v1/conversations/{{conversationId}}/read
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"upToSequence":42}
+
+### Search messages → {items,total,next}
+GET {{baseUrl}}/api/v1/search/messages?q=pizza&limit=20&offset=0
+Authorization: Bearer {{token}}
+
+### Create a group (≥ 3 people including you) → 201
+POST {{baseUrl}}/api/v1/conversations/groups
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"title":"Room 412 · Study crew","memberIds":["{{peerId}}","00000000-0000-0000-0000-000000000001"]}
+
+### Group members
+GET {{baseUrl}}/api/v1/conversations/{{conversationId}}/members
+Authorization: Bearer {{token}}
+
+### Make a member admin (owner only)
+PATCH {{baseUrl}}/api/v1/conversations/{{conversationId}}/members/{{peerId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{"role":"Admin"}
+
+### Leave a group
+POST {{baseUrl}}/api/v1/conversations/{{conversationId}}/leave
+Authorization: Bearer {{token}}
+
+### Sessions
+GET {{baseUrl}}/api/v1/auth/sessions
+Authorization: Bearer {{token}}
+
+### Forgot password → 202
+POST {{baseUrl}}/api/v1/auth/forgot-password
+Content-Type: application/json
+
+{"email":"alice@example.com"}
+
+### Admin: users (limit/offset + total) — 403 for non-admins
+GET {{baseUrl}}/api/v1/admin/users?limit=20&offset=0
+Authorization: Bearer {{token}}
+
+### Admin: audit log
+GET {{baseUrl}}/api/v1/admin/audit?limit=20&offset=0
+Authorization: Bearer {{token}}
