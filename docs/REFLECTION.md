@@ -1,0 +1,14 @@
+# Reflection answers (Lab 01)
+
+1. **Send → close → reopen.** The REST call returns 201 only after the message is committed to PostgreSQL. Reopening the app restores the session through the refresh cookie and loads the newest page of history over REST; nothing is kept only in memory.
+2. **Empty message.** The body is NFC-normalised and trimmed; empty → `422` with `errors.body = ["Message must not be empty."]`. The send button is also disabled client-side, but the server is the authority.
+3. **Data model.** `User`, `Conversation` (+ `ConversationParticipant` with sequence watermarks and a role), `Message` (per-conversation `Sequence`, `UpdatedSequence`, sender snapshot, tombstone), `MessageEditHistory`, `MessageReceipt`, `MessageAttachment`, plus auth tables. ER diagram in the README.
+4. **Where storage happens.** `MessageSender.SendAsync` (Application) allocates the sequence through `IConversationRepository` and adds the message through `IMessageRepository`; `UnitOfWork` (Infrastructure) commits the transaction and only then dispatches events.
+5. **What if…**
+   - *Two messages in the same millisecond:* time is never used for ordering. The conversation row lock in `UPDATE … RETURNING` serialises senders, the unique `(conversation_id, sequence)` index guarantees uniqueness, and commit order equals sequence order. A test fires 20 concurrent sends and asserts 1..21.
+   - *Storage missing or broken:* the database is the store. If it is unreachable, Npgsql retries transient errors, readiness (`/health/ready`) turns 503, API calls return 503 ProblemDetails without internals, and the SPA keeps the message as “not sent — retry” with the same `clientMessageId`, so the retry cannot duplicate it.
+   - *JWT secret leaks:* anyone could mint access tokens. Rotate `Jwt__Secret` (all access tokens die within minutes), revoke refresh families if needed; refresh tokens are stored only as SHA-256 hashes, so a database leak alone does not give sessions.
+   - *Two registrations with the same email/username at once:* partial unique indexes reject the second insert; the command is retried once and then sees the existing row (neutral 202 for email, 409 for username).
+   - *Database down for 30 s:* see above; the client shows a banner and SignalR reconnects with backoff, then resyncs missed messages over REST.
+6. **1 million users.** Stateless API instances behind a load balancer; SignalR Redis backplane (or Azure SignalR) and presence in Redis; read replicas for history/search; partition `messages` by conversation/time; an outbox + broker for push/email fan-out; denormalised unread counters; object storage + CDN for attachments and the SPA.
+7. **Hardest bug candidates.** Sequence commit ordering (solved with the per-conversation row lock), refresh-token reuse detection firing for two tabs (solved with the grace window), and EF treating new child rows with client-generated GUIDs as updates (solved with `ValueGeneratedNever`).
