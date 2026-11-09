@@ -1,0 +1,73 @@
+/*
+ * Migly — Neumorphism ("soft UI") theme.
+ * Surfaces share one background colour and get depth from paired light/dark shadows:
+ * raised elements cast both, pressed elements (inputs, active controls) use inset shadows.
+ * Every colour, radius and shadow is a token here, so the theme is swapped by editing this file only.
+ */
+:root {
+  color-scheme: light;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size: 15px;
+
+  --bg: #e6ebf2;
+  --surface: #e6ebf2;
+  --surface-strong: #edf1f7;
+  --shadow-dark: rgb(163 177 198 / 75%);
+  --shadow-light: rgb(255 255 255 / 90%);
+
+  --fg: #3d4a5c;
+  --fg-strong: #1f2a3a;
+  --fg-muted: #6b778a;
+  --fg-faint: #9aa5b5;
+  --accent: #5b6cf0;
+  --accent-strong: #4655d6;
+  --accent-soft: #dfe3fb;
+  --accent-contrast: #ffffff;
+  --link: #4655d6;
+  --danger: #e0565b;
+  --success: #2fb67c;
+  --warning-bg: #fff4d6;
+  --warning-fg: #6b5410;
+
+  --bubble-mine: #dfe4fb;
+  --bubble-theirs: #edf1f7;
+
+  --radius: 16px;
+  --radius-small: 12px;
+  --radius-pill: 999px;
+  --gap: 14px;
+  --sidebar-width: 360px;
+
+  --raised: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+  --raised-small: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+  --pressed: inset 3px 3px 7px var(--shadow-dark), inset -3px -3px 7px var(--shadow-light);
+  --pressed-deep: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+  --focus-ring: 0 0 0 3px rgb(91 108 240 / 35%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #2a2e35;
+    --surface: #2a2e35;
+    --surface-strong: #30353d;
+    --shadow-dark: rgb(17 19 23 / 80%);
+    --shadow-light: rgb(58 64 74 / 70%);
+
+    --fg: #c9d1dd;
+    --fg-strong: #eef2f8;
+    --fg-muted: #98a3b4;
+    --fg-faint: #6c7686;
+    --accent: #7d8bff;
+    --accent-strong: #97a2ff;
+    --accent-soft: #363c58;
+    --accent-contrast: #12152a;
+    --link: #a3adff;
+    --danger: #ff7b7f;
+    --warning-bg: #4a3f1c;
+    --warning-fg: #ffe7a3;
+
+    --bubble-mine: #363c58;
+    --bubble-theirs: #30353d;
+  }
+}
