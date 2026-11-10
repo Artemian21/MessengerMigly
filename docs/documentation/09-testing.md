@@ -57,7 +57,7 @@ Domain has no references to Application/Infrastructure/Api/EF/ASP.NET/Npgsql/Med
 Two users register in the Ukrainian UI, verify through the link fetched from the Mailpit API, one signs in, finds the other by username, sends a first message, reloads the page, and the message is still there. Configuration: `BASE_URL` (default `http://localhost:5173`), `MAILPIT_URL` (default `http://localhost:8025`).
 
 ### AI summary scenario (`e2e/tests/summary.spec.ts`)
-Alice sends two messages, Bob opens the chat, sees "2 непрочитані повідомлення", presses "Підсумувати" and gets the fake provider's answer. It needs the Python service (`AI_PROVIDER=fake`) and the API with `Ai__Enabled=true` and the same secret on both sides (`appsettings.Development.local.json` + `ai/.env`). Start the API with `RateLimiting__AuthPerMinute=1000`: the specs register several users within a minute. Shared steps (register, verify, login) are in `e2e/tests/helpers.ts`.
+Alice sends two messages, Bob opens the chat, sees "2 непрочитані повідомлення", presses "Підсумувати" and gets the fake provider's answer. It needs the Python service (`AI_PROVIDER=fake`) and the API with `Ai__Enabled=true` and the same secret on both sides (`appsettings.Development.local.json` + the root `.env`). Start the API with `RateLimiting__AuthPerMinute=1000`: the specs register several users within a minute. Shared steps (register, verify, login) are in `e2e/tests/helpers.ts`.
 
 ## Python service tests
 `cd ai && python -m pytest -q` — factory, adapters on stubbed SDK clients, prompts (injection guards), chunking, API (401 before 422, 502 / 504 mapping). No test calls a real provider. CI job `ai`.

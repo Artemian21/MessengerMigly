@@ -49,7 +49,7 @@ All raw SQL uses interpolated, parameterised APIs (`SqlQuery`, `ExecuteSqlInterp
 Opens a connection, takes `pg_advisory_lock(724_110_2026)`, applies pending migrations, releases the lock. Runs at API start (`Database:MigrateOnStartup`, default true) and before CLI commands, so parallel instances never migrate simultaneously.
 
 ### `DemoSeeder`
-`dotnet run --project server/src/Messenger.Api --launch-profile http -- seed` creates 6 users (alice, bohdan, kate, dmytro, iryna and an admin, all `@migly.local`), a group "Room 412 · Study crew" and three personal chats with a few days of natural conversation, an edit, a tombstone, replies, an attachment and mixed read states. It is idempotent (skips if `alice` exists). The password comes from `Seed:Password` (Development sets `Migly-demo-2026`).
+`dotnet run --project server/src/Messenger.Api --launch-profile http -- seed` creates 6 users (alice, bohdan, kate, dmytro, iryna and an admin, all `@migly.local`), a group "Room 412 · Study crew" and five personal chats with a few days of natural conversation, an edit, a tombstone, replies, an attachment and mixed read states. Alice has unread messages (5 from Bohdan, 2 from Dmytro, 1 from Iryna) for trying the unread badges and the AI summary; the read state of everyone is the `Unread` table in `DemoSeeder`. It is idempotent (skips if `alice` exists). The password comes from `Seed:Password` (Development sets `Migly-demo-2026`).
 
 ## Security
 

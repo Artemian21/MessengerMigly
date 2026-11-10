@@ -21,7 +21,7 @@ ASP.NET Core maps `Section__Key` environment variables to `Section:Key`. `.env.e
 | `App__PublicBaseUrl` | `http://localhost:5000` (Dev: `:5173`) | Base URL in email links |
 | `ForwardedHeaders__TrustProxy` | false | `true` behind Render's proxy (real client IPs) |
 | `RateLimiting__GlobalPerMinute/AuthPerMinute/SendBurst/SendPerMinute/SummaryPerMinute` | 60 / 10 / 10 / 30 / 5 | Rate limits |
-| `AI_PROVIDER`, `AI_MODEL`, `GEMINI_API_KEY` / `ANTHROPIC_API_KEY` | — / provider default / — | Python service only: model backend (`gemini`, `anthropic`, `fake`). `AI_SHARED_SECRET` defaults to `Ai__SharedSecret` in the container |
+| `AI_PROVIDER`, `AI_MODEL`, `GEMINI_API_KEY` / `ANTHROPIC_API_KEY` | — / provider default / — | Python service only: model backend (`gemini`, `anthropic`, `fake`). Locally read from the root `.env`; `AI_SHARED_SECRET` defaults to `Ai__SharedSecret` in the container |
 | `Ai__Enabled` | false | AI summary on/off (off → the summary endpoints answer 404) |
 | `Ai__BaseUrl` | `http://127.0.0.1:8000` | Python service (`ai/`) |
 | `Ai__SharedSecret` | — (≥ 16 chars when enabled; startup fails otherwise) | Sent as `X-Ai-Secret`; must equal `AI_SHARED_SECRET` of the Python service |
