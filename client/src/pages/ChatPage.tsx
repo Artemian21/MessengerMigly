@@ -24,6 +24,8 @@ import { formatDay, formatLastSeen, formatTime } from '../lib/format'
 import { MessageBubble, type MessageActions } from '../components/MessageBubble'
 import { Composer } from '../components/Composer'
 import { GroupPanel } from '../components/GroupPanel'
+import { SummaryBanner, type UnreadSnapshot } from '../components/SummaryBanner'
+import { useSummaries } from '../state/summaries'
 import { Avatar, ErrorNotice, Modal } from '../components/ui'
 import { useT } from '../i18n'
 
@@ -53,13 +55,21 @@ function ChatView({ conversationId }: { conversationId: string }) {
   const [panelOpen, setPanelOpen] = useState(false)
   const [highlight, setHighlight] = useState<string | null>(null)
   const [actionError, setActionError] = useState<unknown>(null)
+  // Opening the chat marks it read, so what was unread at that moment is remembered for "summarize what I missed".
+  const [unreadAtOpen, setUnreadAtOpen] = useState<UnreadSnapshot | null>(null)
+  if (unreadAtOpen === null && conversation.data) {
+    setUnreadAtOpen({ count: conversation.data.unreadCount, after: conversation.data.lastReadSequence })
+  }
   const virtuoso = useRef<VirtuosoHandle>(null)
   const lastMarked = useRef(0)
   const acked = useRef(false)
 
   useEffect(() => {
     void realtime.openConversation(conversationId)
-    return () => void realtime.closeConversation(conversationId)
+    return () => {
+      void realtime.closeConversation(conversationId)
+      useSummaries.getState().clearSettled(conversationId) // a summary belongs to this visit; a running one is kept
+    }
   }, [conversationId])
 
   // STS-02: acknowledge what this device received on first load.
@@ -206,6 +216,7 @@ function ChatView({ conversationId }: { conversationId: string }) {
           </button>
         )}
       </header>
+      <SummaryBanner conversationId={conversationId} unread={unreadAtOpen} />
       <div className="chat-body" style={{ position: 'relative' }}>
         <div className="chat-messages" aria-live="polite" aria-relevant="additions">
           {messages.isLoading ? <p className="empty">{t('chat.loading')}</p> : null}

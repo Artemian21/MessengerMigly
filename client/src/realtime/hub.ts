@@ -2,10 +2,11 @@ import { HubConnectionBuilder, HubConnectionState, LogLevel, type HubConnection 
 import type { QueryClient } from '@tanstack/react-query'
 import { currentAccessToken } from '../api/http'
 import { conversationsApi } from '../api/endpoints'
-import type { Conversation, Message, MessageStatus, Presence } from '../api/types'
+import type { Conversation, Message, MessageStatus, Presence, SummaryJobStatus } from '../api/types'
 import { useAuth } from '../state/auth'
 import { useConnectivity } from '../state/connectivity'
 import { useLive } from '../state/live'
+import { useSummaries } from '../state/summaries'
 import {
   applyDeletion,
   applyStatus,
@@ -146,6 +147,10 @@ class RealtimeClient {
     })
     connection.on('PresenceChanged', (p: Presence) => {
       useLive.getState().setPresence([p])
+    })
+    // The result of "summarize what I missed". GET conversations/{id}/summary/{jobId} is the fallback (see useSummary).
+    connection.on('SummaryCompleted', (e: { conversationId: string; jobId: string; status: SummaryJobStatus; summary?: string | null; errorCode?: string | null }) => {
+      useSummaries.getState().finished(e.conversationId, e)
     })
   }
 

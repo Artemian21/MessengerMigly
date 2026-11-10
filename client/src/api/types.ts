@@ -208,3 +208,22 @@ export interface ProblemDetails {
   traceId?: string
   errors?: Record<string, string[]>
 }
+
+export type SummaryJobStatus = 'pending' | 'ready' | 'failed' | 'empty'
+
+/** POST/GET conversations/{id}/summary. `empty` means too few unread messages: no job was created. */
+export interface SummaryJob {
+  jobId: string | null
+  status: SummaryJobStatus
+  summary: string | null
+  errorCode: string | null
+  messageCount: number
+  truncated: boolean
+  fromSequence: number
+  toSequence: number
+}
+
+export interface AiConfig {
+  summaryEnabled: boolean
+  minMessages: number
+}
