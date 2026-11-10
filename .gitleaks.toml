@@ -6,3 +6,10 @@ useDefault = true
 description = "Local development defaults"
 paths = ['''server/src/Messenger.Api/appsettings\.Development\.json''', '''docker-compose\.yml''', '''\.env\.example''']
 regexes = ['''development-only-secret-change-me-0123456789abcdef''']
+
+# Documentation/OpenAPI example password (curl examples, requests.http, OpenAPI samples) — a placeholder, not a credential.
+# Matched against the whole line so it also covers rules that capture a different part of the line (e.g. the sed in the README).
+[[allowlists]]
+description = "Example password used in docs and OpenAPI samples"
+regexTarget = "line"
+regexes = ['''S3cure-pass-123''']
