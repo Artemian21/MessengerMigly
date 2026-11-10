@@ -103,4 +103,6 @@
   <data name="Service unavailable" xml:space="preserve"><value>Сервіс недоступний</value></data>
   <data name="Server error" xml:space="preserve"><value>Помилка сервера</value></data>
   <data name="Search text contains forbidden control characters." xml:space="preserve"><value>Текст пошуку містить заборонені керівні символи.</value></data>
+  <data name="Summary" xml:space="preserve"><value>Підсумок</value></data>
+  <data name="The assistant is busy. Try again in a minute." xml:space="preserve"><value>Помічник зайнятий. Спробуйте за хвилину.</value></data>
 </root>

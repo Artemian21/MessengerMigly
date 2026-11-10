@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
 using Messenger.Application.Abstractions;
+using Messenger.Application.Summaries;
+using Messenger.Domain.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +30,37 @@ public sealed class CapturingEmailSender : IEmailSender
     }
 }
 
+/// <summary>Stands in for the Python AI service. Tests set <see cref="Next"/> / <see cref="Gate"/> and read <see cref="Calls"/>;
+/// the "api" collection runs its classes one after another, so tests call <see cref="Reset"/> first.</summary>
+public sealed class FakeSummarizer : IConversationSummarizer
+{
+    public ConcurrentQueue<(string Language, IReadOnlyList<SummaryMessage> Messages)> Calls { get; } = new();
+
+    /// <summary>The next answer; null means the default "- fake summary".</summary>
+    public Result<string>? Next { get; set; }
+
+    /// <summary>When set, the call waits for it before answering.</summary>
+    public TaskCompletionSource? Gate { get; set; }
+
+    public void Reset()
+    {
+        Calls.Clear();
+        Next = null;
+        Gate = null;
+    }
+
+    public async Task<Result<string>> SummarizeAsync(string language, IReadOnlyList<SummaryMessage> messages, CancellationToken ct)
+    {
+        Calls.Enqueue((language, messages));
+        if (Gate is { } gate)
+        {
+            await gate.Task.WaitAsync(ct);
+        }
+
+        return Next ?? "- fake summary";
+    }
+}
+
 /// <summary>Real PostgreSQL in a container (OPS-03). One container per factory; tests isolate data with unique users.</summary>
 public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -39,6 +72,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         .Build();
 
     public CapturingEmailSender Emails { get; } = new();
+
+    public FakeSummarizer Summarizer { get; } = new();
 
     protected virtual IDictionary<string, string?> Settings => new Dictionary<string, string?>();
 
@@ -59,7 +94,11 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("RateLimiting:AuthPerMinute", "100000");
         builder.UseSetting("RateLimiting:SendBurst", "100000");
         builder.UseSetting("RateLimiting:SendPerMinute", "100000");
+        builder.UseSetting("RateLimiting:SummaryPerMinute", "100000");
         builder.UseSetting("Presence:GraceSeconds", "1");
+        builder.UseSetting("Ai:Enabled", "true");
+        builder.UseSetting("Ai:SharedSecret", "test-shared-secret-0123456789");
+        builder.UseSetting("Ai:MaxMessages", "4"); // small so the truncation test needs only a few messages
         foreach (var (key, value) in Settings)
         {
             builder.UseSetting(key, value);
@@ -69,6 +108,8 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         {
             services.RemoveAll<IEmailSender>();
             services.AddSingleton<IEmailSender>(Emails);
+            services.RemoveAll<IConversationSummarizer>();
+            services.AddSingleton<IConversationSummarizer>(Summarizer);
         });
     }
 }

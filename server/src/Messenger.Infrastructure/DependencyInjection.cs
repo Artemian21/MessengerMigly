@@ -2,6 +2,7 @@ using Messenger.Application.Abstractions;
 using Messenger.Infrastructure.Notifications;
 using Messenger.Infrastructure.Persistence;
 using Messenger.Infrastructure.Security;
+using Messenger.Infrastructure.Summaries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +55,15 @@ public static class DependencyInjection
         {
             services.AddSingleton<IEmailSender, SmtpEmailSender>();
         }
+
+        // AI summary: in-memory jobs + queue, a background worker, and the HTTP client to the Python service (ai/).
+        // AiOptions itself is registered by the API (like AuthOptions).
+        services.AddSingleton<ISummaryJobStore, InMemorySummaryJobStore>();
+        services.AddSingleton<SummaryJobQueue>();
+        services.AddSingleton<ISummaryJobQueue>(sp => sp.GetRequiredService<SummaryJobQueue>());
+        services.AddHttpClient<IConversationSummarizer, HttpConversationSummarizer>(
+            (sp, client) => HttpConversationSummarizer.Configure(client, sp.GetRequiredService<AiOptions>()));
+        services.AddHostedService<SummaryWorker>();
 
         services.Configure<VapidOptions>(configuration.GetSection("Vapid"));
         services.AddHttpClient<IPushSender, WebPushSender>();

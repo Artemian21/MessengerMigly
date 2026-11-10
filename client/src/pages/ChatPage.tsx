@@ -24,6 +24,9 @@ import { formatDay, formatLastSeen, formatTime } from '../lib/format'
 import { MessageBubble, type MessageActions } from '../components/MessageBubble'
 import { Composer } from '../components/Composer'
 import { GroupPanel } from '../components/GroupPanel'
+import { SummaryBanner } from '../components/SummaryBanner'
+import { useUnreadAtOpen } from '../hooks/useUnreadAtOpen'
+import { useSummaries } from '../state/summaries'
 import { Avatar, ErrorNotice, Modal } from '../components/ui'
 import { useT } from '../i18n'
 
@@ -53,6 +56,8 @@ function ChatView({ conversationId }: { conversationId: string }) {
   const [panelOpen, setPanelOpen] = useState(false)
   const [highlight, setHighlight] = useState<string | null>(null)
   const [actionError, setActionError] = useState<unknown>(null)
+  // Opening the chat marks it read, so what was unread at that moment is remembered for "summarize what I missed".
+  const unreadAtOpen = useUnreadAtOpen(conversationId, conversation.isFetchedAfterMount ? conversation.data : undefined)
   const virtuoso = useRef<VirtuosoHandle>(null)
   const lastMarked = useRef(0)
   const acked = useRef(false)
@@ -163,6 +168,7 @@ function ChatView({ conversationId }: { conversationId: string }) {
   const clearChat = async () => {
     if (!confirm(t('chat.confirmDeleteChat'))) return
     await conversationsApi.clear(conversationId)
+    useSummaries.getState().clear(conversationId) // a summary must not outlive the history it was made from
     await queryClient.invalidateQueries({ queryKey: conversationsKey })
     queryClient.removeQueries({ queryKey: messagesKey(conversationId) })
     navigate('/')
@@ -206,6 +212,7 @@ function ChatView({ conversationId }: { conversationId: string }) {
           </button>
         )}
       </header>
+      <SummaryBanner conversationId={conversationId} unread={unreadAtOpen} />
       <div className="chat-body" style={{ position: 'relative' }}>
         <div className="chat-messages" aria-live="polite" aria-relevant="additions">
           {messages.isLoading ? <p className="empty">{t('chat.loading')}</p> : null}

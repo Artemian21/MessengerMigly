@@ -12,6 +12,7 @@ public static class RateLimitPolicies
 {
     public const string Auth = "auth";
     public const string SendMessage = "send-message";
+    public const string Summary = "ai-summary";
 }
 
 public sealed class RateLimitingOptions
@@ -20,6 +21,7 @@ public sealed class RateLimitingOptions
     public int AuthPerMinute { get; set; } = 10;
     public int SendBurst { get; set; } = 10;
     public int SendPerMinute { get; set; } = 30;
+    public int SummaryPerMinute { get; set; } = 5;
 }
 
 public static class RateLimitingSetup
@@ -52,6 +54,10 @@ public static class RateLimitingSetup
                     QueueLimit = 0,
                     AutoReplenishment = true,
                 }));
+            // Each summary costs money: a small per-user window, separate from the message-sending bucket.
+            limiter.AddPolicy(RateLimitPolicies.Summary, http => RateLimitPartition.GetFixedWindowLimiter(
+                http.User.FindFirstValue(ClaimTypesShort.Sub) ?? ClientIp(http),
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = options.SummaryPerMinute, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
             limiter.OnRejected = async (context, ct) =>
             {
                 var retryAfter = context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var after) ? after : TimeSpan.FromSeconds(60);

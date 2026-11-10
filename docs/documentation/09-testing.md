@@ -48,11 +48,19 @@ Domain has no references to Application/Infrastructure/Api/EF/ASP.NET/Npgsql/Med
 - `lib/messages.test.ts` — merge ordering, optimistic replacement, stale revision handling, status monotonicity, tombstones, edit window.
 - `api/http.test.ts` — single shared refresh for parallel 401s, sign-out on rejected refresh, problem details parsing, `Accept-Language`.
 - `components/MessageBubble.test.tsx` — plain-text rendering (no HTML injection), ticks, deleted placeholder, retry, author-only actions.
+- `state/summaries.test.ts` — finished-job handling (stale / duplicate answers ignored), settled vs running results, error-code mapping.
+- `components/SummaryBanner.test.tsx` — offer only above the minimum and when the feature is on, start from the remembered read position, plain-text rendering of hostile text, error messages and retry, empty answer, hide.
 - `lib/format.test.ts`, `i18n/i18n.test.ts` — formatting, key parity between locales, plural forms, interpolation.
 - `test/setup.ts` forces the Ukrainian locale before each test.
 
 ## End-to-end (`e2e/tests/first-message.spec.ts`)
 Two users register in the Ukrainian UI, verify through the link fetched from the Mailpit API, one signs in, finds the other by username, sends a first message, reloads the page, and the message is still there. Configuration: `BASE_URL` (default `http://localhost:5173`), `MAILPIT_URL` (default `http://localhost:8025`).
+
+### AI summary scenario (`e2e/tests/summary.spec.ts`)
+Alice sends two messages, Bob opens the chat, sees "2 непрочитані повідомлення", presses "Підсумувати" and gets the fake provider's answer. It needs the Python service (`AI_PROVIDER=fake`) and the API with `Ai__Enabled=true` and the same secret on both sides (`appsettings.Development.local.json` + the root `.env`). Start the API with `RateLimiting__AuthPerMinute=1000`: the specs register several users within a minute. Shared steps (register, verify, login) are in `e2e/tests/helpers.ts`.
+
+## Python service tests
+`cd ai && python -m pytest -q` — factory, adapters on stubbed SDK clients, prompts (injection guards), chunking, API (401 before 422, 502 / 504 mapping). No test calls a real provider. CI job `ai`.
 
 ## Conventions
 - Test names describe behaviour (`Delete_is_a_tombstone_and_replies_survive`).

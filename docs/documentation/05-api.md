@@ -43,6 +43,7 @@ Full, always-current reference with request/response examples: **`/docs`** (Scal
 | Users | `GET users/me`; `PATCH users/me`; `PUT users/me/username`; `DELETE users/me`; `GET users?q=&limit=&offset=`; `GET users/{id}` |
 | Conversations | `GET conversations`; `GET conversations/{id}`; `GET conversations/direct/{peerUserId}`; `POST conversations/direct/{peerUserId}/messages`; `POST conversations/groups`; `PATCH conversations/{id}`; `POST conversations/{id}/clear`; `POST conversations/{id}/leave`; `DELETE conversations/{id}`; `GET/POST conversations/{id}/members`; `PATCH/DELETE conversations/{id}/members/{userId}` |
 | Messages | `GET/POST conversations/{id}/messages`; `POST conversations/{id}/read`; `GET conversations/{id}/statuses`; `PATCH/DELETE messages/{id}`; `GET messages/{id}/history`, `info`; `POST messages/delivered` |
+| AI summary | `GET ai/config` (`summaryEnabled`, `minMessages`); `POST conversations/{id}/summary[?afterSequence=N]` (202 + `jobId`; 200 `status: "empty"` when fewer than `Ai:MinMessages` (2) are unread); `GET conversations/{id}/summary/{jobId}` (`pending` / `ready` / `failed` + `errorCode`). 404 when `Ai:Enabled` is false |
 | Search | `GET search/messages?q=&conversationId=&limit=&offset=` |
 | Push | `GET push/config`; `POST/DELETE push/subscriptions` |
 | Admin | `GET admin/users`; `POST admin/users/{id}/suspend`, `unsuspend`; `GET admin/audit` |
@@ -61,6 +62,7 @@ All errors are RFC 9457 `application/problem+json` with `type`, `title`, `status
 | Global | 60 / min / IP (fixed window; Development 300) | everything except `/health` |
 | `auth` | 10 / min / IP | register, verify-email, resend-verification, login, forgot/reset-password |
 | `send-message` | token bucket, burst 10, 30 / min per user | message-send endpoints |
+| `ai-summary` | 5 / min per user (fixed window) | `POST conversations/{id}/summary` (each call costs an LLM request) |
 
 Rejections return 429 with `Retry-After` and a problem document. Settings: `RateLimiting:*`. Behind a proxy set `ForwardedHeaders:TrustProxy=true` so the real client IP is used.
 

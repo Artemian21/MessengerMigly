@@ -5,6 +5,7 @@ import { conversationsApi } from '../api/endpoints'
 import type { Conversation } from '../api/types'
 import { useAuth } from '../state/auth'
 import { useLive } from '../state/live'
+import { useSummaries } from '../state/summaries'
 import { conversationsKey } from '../lib/messages'
 import { formatLastSeen } from '../lib/format'
 import { useT } from '../i18n'
@@ -34,11 +35,13 @@ export function GroupPanel({ conversation, onClose }: { conversation: Conversati
   const leave = async () => {
     if (!confirm(t('group.confirmLeave'))) return
     await action.mutateAsync(() => conversationsApi.leave(conversation.id))
+    useSummaries.getState().clear(conversation.id)
     navigate('/')
   }
   const remove = async () => {
     if (!confirm(t('group.confirmDelete'))) return
     await action.mutateAsync(() => conversationsApi.remove(conversation.id))
+    useSummaries.getState().clear(conversation.id)
   }
 
   return (

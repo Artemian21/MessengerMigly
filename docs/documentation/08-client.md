@@ -10,12 +10,12 @@ Stack: React Router, TanStack Query (server state), Zustand (small client state)
 |---|---|
 | `main.tsx`, `App.tsx` | Entry, providers, routes, session bootstrap, route guards |
 | `api/` | `http.ts` (fetch wrapper), `endpoints.ts` (typed calls), `types.ts` (DTO mirrors) |
-| `state/` | Zustand stores: `auth.ts`, `connectivity.ts`, `live.ts` |
+| `state/` | Zustand stores: `auth.ts`, `connectivity.ts`, `live.ts`, `summaries.ts` |
 | `realtime/hub.ts` | SignalR client, cache updates, resync |
-| `hooks/useMessages.ts` | Paged message query with older-page loading |
+| `hooks/` | `useMessages.ts` (paged message query with older-page loading), `useSummary.ts` (start / poll / dismiss a summary) |
 | `lib/` | Pure helpers: `messages.ts` (cache merge rules), `format.ts`, `errors.ts`, `conversations.ts` |
 | `i18n/` | Translation module and `locales/uk.json`, `locales/en.json` |
-| `components/` | `ui.tsx` (Avatar, Modal, Field, ErrorNotice, LanguageSwitch), `MessageBubble`, `Composer`, `UserPicker`, `GroupPanel` |
+| `components/` | `ui.tsx` (Avatar, Modal, Field, ErrorNotice, LanguageSwitch), `MessageBubble`, `Composer`, `UserPicker`, `GroupPanel`, `SummaryBanner` |
 | `pages/` | `AuthPages`, `ChatsLayout`, `ChatPage`, `DraftChatPage`, `NewChatPage`, `SearchPage`, `SettingsPage`, `AdminPage` |
 | `styles/` | `theme.css` (tokens), `app.css` (components) |
 | `test/` | `setup.ts`, `factories.ts` |
@@ -62,9 +62,10 @@ Stack: React Router, TanStack Query (server state), Zustand (small client state)
 - Composer: Enter sends, Shift+Enter new line, counter near the 4000-character limit (grapheme-aware), reply/edit context, throttled typing signal.
 - Modals: message info (per-recipient delivery/read) and edit history (author only).
 - Personal chat deletion = "clear for me"; group settings in `GroupPanel` (rename, members, roles, leave, delete).
+- **"What did I miss" (`SummaryBanner`)**: when the chat is opened with at least `minMessages` unread (from `GET ai/config`, which also says whether the feature is on), a banner offers to summarize. Opening a chat marks it read, so `useUnreadAtOpen` remembers the unread count and read position once per visit and the banner sends the position as `afterSequence`. The source is the conversation **list** cache (kept current by realtime events, 0 after the chat is read), not the per-conversation query: that cache outlives a visit and is refreshed only by refetching, so right after returning to a read chat it still said "5 unread" and offered the button again. The per-conversation query is used only when it was fetched during this visit (page opened directly, list not loaded yet). States: offer → pending → ready / failed / empty. The result arrives as the hub event `SummaryCompleted`; `useSummary` polls `GET …/summary/{jobId}` every 3 s as a safety net. The text is rendered as plain text, carries an "AI-generated" note and says that it is sent to an AI service. A result stays until the user closes it: through switching chats and (mirrored into `sessionStorage` by `state/summaryStorage.ts`, one key per user) through a page reload; a running job resumes polling after a reload. The card shows the size and time of the summary. It is dropped on "delete chat", on leaving or deleting a group, and everything is wiped when the session ends (sign-out, expired session, deleted account). Closing it also withdraws the offer for that visit.
 
 ## Realtime (`realtime/hub.ts`)
-Singleton `RealtimeClient`: starts after sign-in, automatic reconnect with backoff, updates the query cache from events (`MessageReceived/Updated/Deleted`, `MessageStatusChanged`, `ConversationUpdated/Read`, `Typing`, `PresenceChanged`) and resyncs over REST after reconnect. Event handlers must not return values (SignalR would treat them as client results). Details in [Realtime](06-realtime.md).
+Singleton `RealtimeClient`: starts after sign-in, automatic reconnect with backoff, updates the query cache from events (`MessageReceived/Updated/Deleted`, `MessageStatusChanged`, `ConversationUpdated/Read`, `Typing`, `PresenceChanged`) and the summary store (`SummaryCompleted`) and resyncs over REST after reconnect. Event handlers must not return values (SignalR would treat them as client results). Details in [Realtime](06-realtime.md).
 
 ## Internationalization (`i18n/`)
 - Languages: **Ukrainian (default) and English**; resource files `locales/uk.json` and `locales/en.json`.

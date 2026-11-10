@@ -33,6 +33,7 @@ All hub methods go through MediatR (`CheckMembershipQuery`, `AckDeliveredCommand
 | `MessageStatusChanged` | `{conversationId, messageId, status}` | the author only |
 | `ConversationUpdated` | `{conversationId}` | current members plus users just removed |
 | `ConversationRead` | `{conversationId, lastReadSequence}` | the reader's other devices |
+| `SummaryCompleted` | `{conversationId, jobId, status: "ready"\|"failed", summary?, errorCode?}` | every device of the user who asked for the summary; `GET conversations/{id}/summary/{jobId}` is the fallback |
 | `Typing` | `{conversationId, userId}` | group `conv:{id}` except the sender |
 | `PresenceChanged` | `{userId, online, lastSeenAt?}` | group `presence:{userId}` |
 

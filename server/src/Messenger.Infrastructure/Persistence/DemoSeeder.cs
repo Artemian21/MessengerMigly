@@ -80,6 +80,27 @@ public sealed class DemoSeeder(MessengerDbContext db, IPasswordHasher hasher, IC
         ("bohdan-dmytro", "dmytro", "Thanks. Gym tomorrow at 7?", 412, null),
         ("bohdan-dmytro", "bohdan", "Make it 8, I'm not a morning person", 430, null),
         ("bohdan-dmytro", "dmytro", "Deal", 431, null),
+
+        // The newest messages of these chats are unread for Alice (see Unread), so the unread badges and the AI summary
+        // ("what did I miss") can be tried right after seeding. Keep "PDF" out of the texts: it adds an attachment below.
+        ("alice-bohdan", "bohdan", "Hey! Reminder: Lab 03 has to be submitted by Friday.", 3310, null),
+        ("alice-bohdan", "bohdan", "The teacher said the report has to be a .pdf, not a Word file.", 3312, null),
+        ("alice-bohdan", "bohdan", "Has anyone finished task two yet? I'm stuck on PostgreSQL indexes.", 3315, null),
+        ("alice-bohdan", "bohdan", "If you want, I can show you my solution tomorrow after class.", 3318, null),
+        ("alice-bohdan", "bohdan", "Also: the consultation moved to Thursday, 15:30, room 412.", 3322, null),
+        ("alice-dmytro", "dmytro", "Alice, are you joining the hackathon this weekend? We're one person short.", 3325, null),
+        ("alice-dmytro", "dmytro", "Team registration closes tonight at 23:59.", 3327, null),
+        ("alice-iryna", "iryna", "I left your algorithms notes at the library, can you pick them up tomorrow?", 3330, null),
+    ];
+
+    // How many of the newest messages of a conversation each person has not read yet; everyone else has read everything.
+    private static readonly (string Conv, string User, int Count)[] Unread =
+    [
+        ("crew", "iryna", 4),
+        ("crew", "dmytro", 4),
+        ("alice-bohdan", "alice", 5),
+        ("alice-dmytro", "alice", 2),
+        ("alice-iryna", "alice", 1),
     ];
 
     public async Task SeedAsync(string password, CancellationToken ct)
@@ -122,7 +143,7 @@ public sealed class DemoSeeder(MessengerDbContext db, IPasswordHasher hasher, IC
             await db.SaveChangesAsync(ct);
 
             var conversationIds = new Dictionary<string, Guid> { ["crew"] = crew.Id };
-            foreach (var pair in new[] { "alice-bohdan", "alice-kate", "bohdan-dmytro" })
+            foreach (var pair in new[] { "alice-bohdan", "alice-kate", "bohdan-dmytro", "alice-dmytro", "alice-iryna" })
             {
                 var parts = pair.Split('-');
                 conversationIds[pair] = await conversations.GetOrCreateDirectAsync(users[parts[0]].Id, users[parts[1]].Id, origin, ct);
@@ -154,7 +175,7 @@ public sealed class DemoSeeder(MessengerDbContext db, IPasswordHasher hasher, IC
             oops.Delete(oops.SenderId, deleteSequence!.Value, origin.AddMinutes(50));
             await db.SaveChangesAsync(ct);
 
-            // Mixed read states: everything delivered; Iryna and Dmytro have unread messages in the crew chat.
+            // Mixed read states: everything delivered; the people listed in Unread have not read the newest messages.
             var lastSeen = origin.AddMinutes(3300);
             foreach (var (conv, conversationId) in conversationIds)
             {
@@ -162,7 +183,8 @@ public sealed class DemoSeeder(MessengerDbContext db, IPasswordHasher hasher, IC
                 var participantIds = await db.ParticipantSet.Where(p => p.ConversationId == conversationId).Select(p => p.UserId).ToListAsync(ct);
                 foreach (var userId in participantIds)
                 {
-                    var readUpTo = conv == "crew" && (userId == users["iryna"].Id || userId == users["dmytro"].Id) ? last - 4 : last;
+                    var unread = Unread.Where(u => u.Conv == conv && users[u.User].Id == userId).Sum(u => u.Count);
+                    var readUpTo = last - unread;
                     await db.Database.ExecuteSqlInterpolatedAsync($"""
                         INSERT INTO message_receipts (message_id, user_id, delivered_at, read_at)
                         SELECT m.id, {userId}, {lastSeen}, CASE WHEN m.sequence <= {readUpTo} THEN {lastSeen} END
