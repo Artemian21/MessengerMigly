@@ -7,4 +7,10 @@ useDefault = true
 [allowlist]
 description = "Local development defaults and documentation example password"
 paths = ['''server/src/Messenger.Api/appsettings\.Development\.json''', '''docker-compose\.yml''', '''\.env\.example''']
-regexes = ['''development-only-secret-change-me-0123456789abcdef''', '''S3cure-pass-123''']
+regexes = [
+  '''development-only-secret-change-me-0123456789abcdef''',
+  '''S3cure-pass-123''',
+  # Test values (unit tests, the e2e helper, the README run example). Anchored: only these exact values are allowed.
+  '''^0123456789abcdef$''',
+  '''^E2e-strong-pass-1$''',
+]
