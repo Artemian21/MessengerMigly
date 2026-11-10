@@ -94,6 +94,14 @@ Commands: `CreateGroup`, `RenameGroup`, `AddMembers`, `RemoveMember`, `ChangeMem
 - `SearchMessagesQuery` — case-insensitive substring search over visible, non-deleted messages, paged with snippet.
 - `MessageReader` — shared projection: sender (snapshot for deleted accounts), reply preview, attachments, aggregate status for the viewer's own messages.
 
+### AI summary (`Summaries/`)
+"What did I miss": a background summary of the caller's unread messages, produced by the Python service in `ai/`.
+- **`StartSummaryQuery`** (`IConversationMemberRequest`; a query because nothing is written to the database and a transaction retry must not create a second job). Snapshot at request time: messages after `max(floor, LastReadSequence)` from other people, not deleted, latest `Ai:MaxMessages` (300) read through `MessageReader`, so every watermark applies. Then `ISummaryJobStore.GetOrCreateActive` (one pending job per user and conversation) and `ISummaryJobQueue.TryEnqueue`; a full queue gives 409 `ai_busy`. Nothing unread → status `empty`, no job.
+- **`GetSummaryQuery`** — state of a job; only its owner and only through its own conversation, otherwise 404.
+- **`SummaryJobProcessor`** — runs one job: `IConversationSummarizer` → `store.Complete/Fail` → `IRealtimeNotifier.SummaryCompletedAsync`. A lost notification is logged, never fatal (the client can `GET`). Logs ids, statuses and counts only.
+- Ports: `IConversationSummarizer` (HTTP to Python, in Infrastructure), `ISummaryJobStore` (in memory, TTL `Ai:JobTtlMinutes`, texts dropped when a job finishes), `ISummaryJobQueue` (bounded channel). `SummaryWorker` (a `BackgroundService` in Infrastructure) reads the queue with `Ai:MaxConcurrency` loops. The summary language is taken from the request culture (`Accept-Language`): `uk` or `en`.
+- Job failures reach the client as `errorCode` (`provider_unavailable`, `timeout`, `internal`), not as text; the client owns the wording.
+
 ### Admin, Push
 `AdminListUsersQuery`, `SuspendUserCommand`, `UnsuspendUserCommand`, `ListAuditLogQuery` (all `IAdminRequest`; admins cannot read message content). `GetPushConfigQuery`, `SubscribePushCommand`, `UnsubscribePushCommand`.
 

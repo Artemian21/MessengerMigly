@@ -20,7 +20,12 @@ ASP.NET Core maps `Section__Key` environment variables to `Section:Key`. `.env.e
 | `Authentication__Google__ClientId/ClientSecret`, `Authentication__GitHub__…` | empty | OAuth (provider hidden when empty) |
 | `App__PublicBaseUrl` | `http://localhost:5000` (Dev: `:5173`) | Base URL in email links |
 | `ForwardedHeaders__TrustProxy` | false | `true` behind Render's proxy (real client IPs) |
-| `RateLimiting__GlobalPerMinute/AuthPerMinute/SendBurst/SendPerMinute` | 60 / 10 / 10 / 30 | Rate limits |
+| `RateLimiting__GlobalPerMinute/AuthPerMinute/SendBurst/SendPerMinute/SummaryPerMinute` | 60 / 10 / 10 / 30 / 5 | Rate limits |
+| `Ai__Enabled` | false | AI summary on/off (off → the summary endpoints answer 404) |
+| `Ai__BaseUrl` | `http://127.0.0.1:8000` | Python service (`ai/`) |
+| `Ai__SharedSecret` | — (≥ 16 chars when enabled; startup fails otherwise) | Sent as `X-Ai-Secret`; must equal `AI_SHARED_SECRET` of the Python service |
+| `Ai__TimeoutSeconds` / `Ai__MaxMessages` | 30 / 300 | HTTP timeout to the service; unread messages per summary |
+| `Ai__JobTtlMinutes` / `Ai__MaxConcurrency` / `Ai__QueueCapacity` | 15 / 2 / 50 | Job retention, parallel summaries, queue size |
 | `Presence__GraceSeconds` | 7 | Delay before "offline" |
 | `Database__MigrateOnStartup` | true | Apply migrations at start |
 | `Cors__AllowedOrigins` | empty | Only for a cross-origin front end |
