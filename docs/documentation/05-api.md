@@ -43,7 +43,7 @@ Full, always-current reference with request/response examples: **`/docs`** (Scal
 | Users | `GET users/me`; `PATCH users/me`; `PUT users/me/username`; `DELETE users/me`; `GET users?q=&limit=&offset=`; `GET users/{id}` |
 | Conversations | `GET conversations`; `GET conversations/{id}`; `GET conversations/direct/{peerUserId}`; `POST conversations/direct/{peerUserId}/messages`; `POST conversations/groups`; `PATCH conversations/{id}`; `POST conversations/{id}/clear`; `POST conversations/{id}/leave`; `DELETE conversations/{id}`; `GET/POST conversations/{id}/members`; `PATCH/DELETE conversations/{id}/members/{userId}` |
 | Messages | `GET/POST conversations/{id}/messages`; `POST conversations/{id}/read`; `GET conversations/{id}/statuses`; `PATCH/DELETE messages/{id}`; `GET messages/{id}/history`, `info`; `POST messages/delivered` |
-| AI summary | `POST conversations/{id}/summary` (202 + `jobId`; 200 `status: "empty"` when nothing is unread); `GET conversations/{id}/summary/{jobId}` (`pending` / `ready` / `failed` + `errorCode`). 404 when `Ai:Enabled` is false |
+| AI summary | `GET ai/config` (`summaryEnabled`, `minMessages`); `POST conversations/{id}/summary[?afterSequence=N]` (202 + `jobId`; 200 `status: "empty"` when fewer than `Ai:MinMessages` (2) are unread); `GET conversations/{id}/summary/{jobId}` (`pending` / `ready` / `failed` + `errorCode`). 404 when `Ai:Enabled` is false |
 | Search | `GET search/messages?q=&conversationId=&limit=&offset=` |
 | Push | `GET push/config`; `POST/DELETE push/subscriptions` |
 | Admin | `GET admin/users`; `POST admin/users/{id}/suspend`, `unsuspend`; `GET admin/audit` |

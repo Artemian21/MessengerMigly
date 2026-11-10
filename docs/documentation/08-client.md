@@ -10,12 +10,12 @@ Stack: React Router, TanStack Query (server state), Zustand (small client state)
 |---|---|
 | `main.tsx`, `App.tsx` | Entry, providers, routes, session bootstrap, route guards |
 | `api/` | `http.ts` (fetch wrapper), `endpoints.ts` (typed calls), `types.ts` (DTO mirrors) |
-| `state/` | Zustand stores: `auth.ts`, `connectivity.ts`, `live.ts` |
+| `state/` | Zustand stores: `auth.ts`, `connectivity.ts`, `live.ts`, `summaries.ts` |
 | `realtime/hub.ts` | SignalR client, cache updates, resync |
-| `hooks/useMessages.ts` | Paged message query with older-page loading |
+| `hooks/` | `useMessages.ts` (paged message query with older-page loading), `useSummary.ts` (start / poll / dismiss a summary) |
 | `lib/` | Pure helpers: `messages.ts` (cache merge rules), `format.ts`, `errors.ts`, `conversations.ts` |
 | `i18n/` | Translation module and `locales/uk.json`, `locales/en.json` |
-| `components/` | `ui.tsx` (Avatar, Modal, Field, ErrorNotice, LanguageSwitch), `MessageBubble`, `Composer`, `UserPicker`, `GroupPanel` |
+| `components/` | `ui.tsx` (Avatar, Modal, Field, ErrorNotice, LanguageSwitch), `MessageBubble`, `Composer`, `UserPicker`, `GroupPanel`, `SummaryBanner` |
 | `pages/` | `AuthPages`, `ChatsLayout`, `ChatPage`, `DraftChatPage`, `NewChatPage`, `SearchPage`, `SettingsPage`, `AdminPage` |
 | `styles/` | `theme.css` (tokens), `app.css` (components) |
 | `test/` | `setup.ts`, `factories.ts` |
@@ -62,9 +62,10 @@ Stack: React Router, TanStack Query (server state), Zustand (small client state)
 - Composer: Enter sends, Shift+Enter new line, counter near the 4000-character limit (grapheme-aware), reply/edit context, throttled typing signal.
 - Modals: message info (per-recipient delivery/read) and edit history (author only).
 - Personal chat deletion = "clear for me"; group settings in `GroupPanel` (rename, members, roles, leave, delete).
+- **"What did I miss" (`SummaryBanner`)**: when the chat is opened with at least `minMessages` unread (from `GET ai/config`, which also says whether the feature is on), a banner offers to summarize. Opening a chat marks it read, so `ChatPage` remembers the unread count and read position from that moment and the banner sends the position as `afterSequence`. States: offer → pending → ready / failed / empty. The result arrives as the hub event `SummaryCompleted`; `useSummary` polls `GET …/summary/{jobId}` every 3 s as a safety net. The text is rendered as plain text, carries an "AI-generated" note and says that it is sent to an AI service. A finished result is dropped when the chat is left; a running job is kept.
 
 ## Realtime (`realtime/hub.ts`)
-Singleton `RealtimeClient`: starts after sign-in, automatic reconnect with backoff, updates the query cache from events (`MessageReceived/Updated/Deleted`, `MessageStatusChanged`, `ConversationUpdated/Read`, `Typing`, `PresenceChanged`) and resyncs over REST after reconnect. Event handlers must not return values (SignalR would treat them as client results). Details in [Realtime](06-realtime.md).
+Singleton `RealtimeClient`: starts after sign-in, automatic reconnect with backoff, updates the query cache from events (`MessageReceived/Updated/Deleted`, `MessageStatusChanged`, `ConversationUpdated/Read`, `Typing`, `PresenceChanged`) and the summary store (`SummaryCompleted`) and resyncs over REST after reconnect. Event handlers must not return values (SignalR would treat them as client results). Details in [Realtime](06-realtime.md).
 
 ## Internationalization (`i18n/`)
 - Languages: **Ukrainian (default) and English**; resource files `locales/uk.json` and `locales/en.json`.

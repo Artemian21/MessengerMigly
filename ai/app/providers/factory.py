@@ -14,7 +14,7 @@ class ConfigError(Exception):
 # Used when AI_MODEL is empty. Override with AI_MODEL; models are retired over time.
 DEFAULT_MODELS = {
     "anthropic": "claude-haiku-5-5",
-    "gemini": "gemini-2.5-flash",
+    "gemini": "gemini-3.5-flash-lite",
 }
 
 
