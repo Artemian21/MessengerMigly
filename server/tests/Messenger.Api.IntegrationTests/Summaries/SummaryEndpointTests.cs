@@ -30,9 +30,11 @@ public sealed class SummaryEndpointTests
 
     private static string Url(Guid conversationId) => $"/api/v1/conversations/{conversationId}/summary";
 
-    private static async Task<(HttpStatusCode Status, SummaryJobDto Dto)> StartAsync(TestUser user, Guid conversationId, string? language = null)
+    private static async Task<(HttpStatusCode Status, SummaryJobDto Dto)> StartAsync(
+        TestUser user, Guid conversationId, string? language = null, long? afterSequence = null)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, Url(conversationId));
+        var url = afterSequence is null ? Url(conversationId) : $"{Url(conversationId)}?afterSequence={afterSequence}";
+        using var request = new HttpRequestMessage(HttpMethod.Post, url);
         if (language is not null)
         {
             request.Headers.Add("Accept-Language", language);
@@ -102,6 +104,78 @@ public sealed class SummaryEndpointTests
         _ai.Calls.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task AfterSequence_summarizes_messages_that_opening_the_chat_already_marked_as_read()
+    {
+        var alice = await TestUsers.CreateAsync(_factory, "ta");
+        var bob = await TestUsers.CreateAsync(_factory, "tb");
+        var first = await alice.SendDirectAsync(bob.Id, "m1");
+        await alice.SendAsync(first.ConversationId, "m2");
+        var last = await alice.SendAsync(first.ConversationId, "m3");
+        (await bob.Client.PostAsJsonAsync($"/api/v1/conversations/{first.ConversationId}/read", new MarkReadRequest(last.Sequence)))
+            .StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        (await StartAsync(bob, first.ConversationId)).Dto.Status.ShouldBe("empty"); // everything is read now
+
+        var (status, started) = await StartAsync(bob, first.ConversationId, afterSequence: 0);
+
+        status.ShouldBe(HttpStatusCode.Accepted);
+        await WaitUntilFinishedAsync(bob, first.ConversationId, started.JobId!.Value);
+        SummarizedBodies().ShouldBe(["m1", "m2", "m3"]);
+    }
+
+    [Fact]
+    public async Task AfterSequence_can_never_reach_below_the_cleared_history()
+    {
+        var alice = await TestUsers.CreateAsync(_factory, "tc");
+        var bob = await TestUsers.CreateAsync(_factory, "td");
+        var first = await alice.SendDirectAsync(bob.Id, "before clear 1");
+        await alice.SendAsync(first.ConversationId, "before clear 2");
+        (await bob.Client.PostAsync($"/api/v1/conversations/{first.ConversationId}/clear", null)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+        await alice.SendAsync(first.ConversationId, "after clear 1");
+        await alice.SendAsync(first.ConversationId, "after clear 2");
+
+        var (_, started) = await StartAsync(bob, first.ConversationId, afterSequence: 0);
+        await WaitUntilFinishedAsync(bob, first.ConversationId, started.JobId!.Value);
+
+        SummarizedBodies().ShouldBe(["after clear 1", "after clear 2"]);
+    }
+
+    [Fact]
+    public async Task A_negative_AfterSequence_is_rejected_and_the_ai_config_is_exposed()
+    {
+        var alice = await TestUsers.CreateAsync(_factory, "te");
+        var bob = await TestUsers.CreateAsync(_factory, "tf");
+        var first = await alice.SendDirectAsync(bob.Id, "hi");
+
+        (await StartAsync(bob, first.ConversationId, afterSequence: -1)).Status.ShouldBe(HttpStatusCode.UnprocessableEntity);
+
+        var config = await bob.GetJsonAsync<AiConfigDto>("/api/v1/ai/config");
+        config.ShouldBe(new AiConfigDto(true, 2));
+        (await _factory.CreateClient().GetAsync("/api/v1/ai/config")).StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task A_single_unread_message_is_below_the_minimum_and_not_worth_an_ai_call()
+    {
+        var alice = await TestUsers.CreateAsync(_factory, "sy");
+        var bob = await TestUsers.CreateAsync(_factory, "sz");
+        var first = await alice.SendDirectAsync(bob.Id, "just one");
+
+        var (status, one) = await StartAsync(bob, first.ConversationId);
+
+        status.ShouldBe(HttpStatusCode.OK);
+        one.Status.ShouldBe("empty");
+        one.JobId.ShouldBeNull();
+        _ai.Calls.ShouldBeEmpty();
+
+        await alice.SendAsync(first.ConversationId, "and a second one"); // two is enough (Ai:MinMessages = 2)
+        var (second, two) = await StartAsync(bob, first.ConversationId);
+        second.ShouldBe(HttpStatusCode.Accepted);
+        await WaitUntilFinishedAsync(bob, first.ConversationId, two.JobId!.Value);
+        SummarizedBodies().ShouldBe(["just one", "and a second one"]);
+    }
+
     [Theory]
     [InlineData("uk", "uk")]
     [InlineData("uk-UA", "uk")]
@@ -112,6 +186,7 @@ public sealed class SummaryEndpointTests
         var alice = await TestUsers.CreateAsync(_factory, "se");
         var bob = await TestUsers.CreateAsync(_factory, "sf");
         var first = await alice.SendDirectAsync(bob.Id, "hi");
+        await alice.SendAsync(first.ConversationId, "hi again");
 
         var (_, started) = await StartAsync(bob, first.ConversationId, acceptLanguage);
         await WaitUntilFinishedAsync(bob, first.ConversationId, started.JobId!.Value);
@@ -126,6 +201,7 @@ public sealed class SummaryEndpointTests
         var bob = await TestUsers.CreateAsync(_factory, "sh");
         var outsider = await TestUsers.CreateAsync(_factory, "si");
         var first = await alice.SendDirectAsync(bob.Id, "private");
+        await alice.SendAsync(first.ConversationId, "still private");
         var (_, started) = await StartAsync(bob, first.ConversationId);
         await WaitUntilFinishedAsync(bob, first.ConversationId, started.JobId!.Value);
 
@@ -145,14 +221,15 @@ public sealed class SummaryEndpointTests
         var bob = await TestUsers.CreateAsync(_factory, "sk");
         await alice.SendDirectAsync(bob.Id, "old 1");
         var second = await alice.SendDirectAsync(bob.Id, "old 2");
-        await alice.SendAsync(second.ConversationId, "new");
+        await alice.SendAsync(second.ConversationId, "new 1");
+        await alice.SendAsync(second.ConversationId, "new 2");
         (await bob.Client.PostAsJsonAsync($"/api/v1/conversations/{second.ConversationId}/read", new MarkReadRequest(second.Sequence)))
             .StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var (_, started) = await StartAsync(bob, second.ConversationId);
         await WaitUntilFinishedAsync(bob, second.ConversationId, started.JobId!.Value);
 
-        SummarizedBodies().ShouldBe(["new"]);
+        SummarizedBodies().ShouldBe(["new 1", "new 2"]);
     }
 
     [Fact]
@@ -214,6 +291,7 @@ public sealed class SummaryEndpointTests
         var alice = await TestUsers.CreateAsync(_factory, "ss");
         var bob = await TestUsers.CreateAsync(_factory, "st");
         var first = await alice.SendDirectAsync(bob.Id, "secret plans");
+        await alice.SendAsync(first.ConversationId, "more secret plans");
         _ai.Next = Result<string>.Failure(new Error(ErrorType.Conflict, SummaryErrorCodes.Timeout, "contains secret plans"));
 
         var (_, started) = await StartAsync(bob, first.ConversationId);
@@ -230,6 +308,7 @@ public sealed class SummaryEndpointTests
         var alice = await TestUsers.CreateAsync(_factory, "su");
         var bob = await TestUsers.CreateAsync(_factory, "sv");
         var first = await alice.SendDirectAsync(bob.Id, "hi");
+        await alice.SendAsync(first.ConversationId, "hi again");
         _ai.Gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var (_, one) = await StartAsync(bob, first.ConversationId);
@@ -253,6 +332,7 @@ public sealed class SummaryEndpointTests
         var alice = await TestUsers.CreateAsync(_factory, "sw");
         var bob = await TestUsers.CreateAsync(_factory, "sx");
         var first = await alice.SendDirectAsync(bob.Id, "hi");
+        await alice.SendAsync(first.ConversationId, "hi again");
         var events = Channel.CreateUnbounded<JsonElement>();
         await using var hub = new HubConnectionBuilder()
             .WithUrl(new Uri(_factory.Server.BaseAddress, "/hubs/chat"), options =>

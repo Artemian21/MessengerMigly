@@ -25,6 +25,10 @@ public sealed class AiOptions
     public int TimeoutSeconds { get; set; } = 30;
 
     public int MaxMessages { get; set; } = 300;
+
+    /// <summary>Fewer unread messages than this are not worth a paid LLM call: the answer is "empty".</summary>
+    public int MinMessages { get; set; } = 2;
+
     public int JobTtlMinutes { get; set; } = 15;
     public int MaxConcurrency { get; set; } = 2;
     public int QueueCapacity { get; set; } = 50;

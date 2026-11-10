@@ -41,6 +41,8 @@ public static class ApiSetup
     public static void AddMessengerServices(this WebApplicationBuilder builder)
     {
         var services = builder.Services;
+        // Developer-only overrides and secrets (git-ignored): appsettings.Development.local.json. Absent elsewhere.
+        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.local.json", optional: true, reloadOnChange: false);
         var configuration = builder.Configuration;
         builder.AddMessengerLogging();
         ValidateSecrets(builder);

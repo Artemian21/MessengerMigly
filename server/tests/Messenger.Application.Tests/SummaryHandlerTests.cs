@@ -52,6 +52,29 @@ public sealed class SummaryHandlerTests
     }
 
     [Fact]
+    public async Task Start_rejects_a_negative_AfterSequence()
+    {
+        var validator = new StartSummaryValidator();
+
+        validator.Validate(new StartSummaryQuery(Guid.NewGuid(), -1)).IsValid.ShouldBeFalse();
+        validator.Validate(new StartSummaryQuery(Guid.NewGuid(), 0)).IsValid.ShouldBeTrue();
+        validator.Validate(new StartSummaryQuery(Guid.NewGuid())).IsValid.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(true, 2, 2)]
+    [InlineData(false, 3, 3)]
+    [InlineData(true, 0, 1)] // a misconfigured minimum never drops below one message
+    public async Task Config_reports_whether_summaries_are_on_and_the_minimum(bool enabled, int configured, int reported)
+    {
+        var handler = new GetAiConfigHandler(new AiOptions { Enabled = enabled, MinMessages = configured });
+
+        var result = await handler.Handle(new GetAiConfigQuery(), CancellationToken.None);
+
+        result.Value.ShouldBe(new AiConfigDto(enabled, reported));
+    }
+
+    [Fact]
     public async Task Get_returns_the_owners_job_with_its_state()
     {
         var conversation = Guid.NewGuid();

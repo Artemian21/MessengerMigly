@@ -132,13 +132,14 @@ public sealed class ConversationsController(ISender mediator) : ApiControllerBas
 
     [HttpPost("{id:guid}/summary"), EnableRateLimiting(RateLimitPolicies.Summary)]
     [EndpointSummary("Summarize what I have not read (\"що я пропустив\")")]
-    [EndpointDescription("Starts a background summary of my unread messages (latest 300, my watermarks apply) and returns 202 with a jobId; the result arrives as the SummaryCompleted hub event and via GET. 200 with status \"empty\" when nothing is unread; an already running job is returned instead of a new one. 404 when the AI summary is switched off.")]
+    [EndpointDescription("Starts a background summary of my unread messages (latest 300, my watermarks apply) and returns 202 with a jobId; the result arrives as the SummaryCompleted hub event and via GET. 200 with status \"empty\" when fewer than 2 messages are unread (Ai:MinMessages); an already running job is returned instead of a new one. `afterSequence` (optional) summarizes messages after that sequence instead of after my read position; the join/clear watermarks still apply. 404 when the AI summary is switched off.")]
     [ProducesResponseType(typeof(SummaryJobDto), StatusCodes.Status202Accepted)]
     [ProducesResponseType(typeof(SummaryJobDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public Task<IActionResult> StartSummary(Guid id, CancellationToken ct) =>
-        Send(new StartSummaryQuery(id), job => job.Status == "empty" ? Ok(job) : Accepted(job), ct);
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> StartSummary(Guid id, [FromQuery] long? afterSequence, CancellationToken ct) =>
+        Send(new StartSummaryQuery(id, afterSequence), job => job.Status == "empty" ? Ok(job) : Accepted(job), ct);
 
     [HttpGet("{id:guid}/summary/{jobId:guid}")]
     [EndpointSummary("Get a summary job")]
