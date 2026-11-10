@@ -43,6 +43,7 @@ public static class ApiSetup
         var services = builder.Services;
         // Developer-only overrides and secrets (git-ignored): appsettings.Development.local.json. Absent elsewhere.
         builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.local.json", optional: true, reloadOnChange: false);
+        builder.Configuration.AddEnvironmentVariables(); // real environment variables still win over the local file
         var configuration = builder.Configuration;
         builder.AddMessengerLogging();
         ValidateSecrets(builder);
