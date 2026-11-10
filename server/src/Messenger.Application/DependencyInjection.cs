@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<ConversationReader>();
         services.AddScoped<SessionIssuer>();
         services.AddScoped<UserTokenIssuer>();
+        services.AddScoped<Summaries.SummaryJobProcessor>();
         return services;
     }
 }

@@ -1,3 +1,4 @@
+using Messenger.Application.Summaries;
 using Messenger.Domain.Common;
 using Messenger.Domain.Conversations;
 using Messenger.Domain.Messages;
@@ -173,4 +174,35 @@ public interface IRealtimeNotifier
     Task MessageStatusChangedAsync(Guid authorId, Guid conversationId, Guid messageId, string status, CancellationToken ct);
     Task ConversationUpdatedAsync(IReadOnlyCollection<Guid> userIds, Guid conversationId, CancellationToken ct);
     Task ConversationReadAsync(Guid userId, Guid conversationId, long lastReadSequence, CancellationToken ct);
+
+    /// <summary>Result of a summary job for every device of the requester. status is ready | failed.</summary>
+    Task SummaryCompletedAsync(Guid userId, Guid conversationId, Guid jobId, string status, string? summary, string? errorCode, CancellationToken ct);
+}
+
+/// <summary>Talks to the Python AI service. A failure carries one of <see cref="SummaryErrorCodes"/> as the error code.</summary>
+public interface IConversationSummarizer
+{
+    Task<Result<string>> SummarizeAsync(string language, IReadOnlyList<SummaryMessage> messages, CancellationToken ct);
+}
+
+/// <summary>In-memory summary jobs (single instance, like presence). Entries expire after Ai:JobTtlMinutes.</summary>
+public interface ISummaryJobStore
+{
+    /// <summary>The user's pending job in this conversation, if any.</summary>
+    SummaryJob? FindActive(Guid userId, Guid conversationId);
+
+    /// <summary>Atomically returns the user's pending job for the conversation, or stores <paramref name="candidate"/>.</summary>
+    (SummaryJob Job, bool Created) GetOrCreateActive(SummaryJob candidate);
+
+    /// <summary>Null when the job does not exist or has expired.</summary>
+    SummaryJob? Get(Guid jobId);
+
+    void Complete(Guid jobId, string summary);
+    void Fail(Guid jobId, string errorCode);
+}
+
+public interface ISummaryJobQueue
+{
+    /// <summary>False when the queue is full.</summary>
+    bool TryEnqueue(Guid jobId);
 }
