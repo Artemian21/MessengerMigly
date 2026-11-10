@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="One or more validation errors occurred." xml:space="preserve"><value>Деякі поля заповнено неправильно.</value></data>
+  <data name="{0} was not found." xml:space="preserve"><value>{0}: не знайдено.</value></data>
+  <data name="Conversation" xml:space="preserve"><value>Розмову</value></data>
+  <data name="Message" xml:space="preserve"><value>Повідомлення</value></data>
+  <data name="User" xml:space="preserve"><value>Користувача</value></data>
+  <data name="Member" xml:space="preserve"><value>Учасника</value></data>
+  <data name="Session" xml:space="preserve"><value>Сесію</value></data>
+  <data name="Provider" xml:space="preserve"><value>Провайдера</value></data>
+  <data name="Push notifications" xml:space="preserve"><value>Push-сповіщення</value></data>
+  <data name="You are not allowed to perform this action." xml:space="preserve"><value>У вас немає прав на цю дію.</value></data>
+  <data name="Authentication is required." xml:space="preserve"><value>Потрібно увійти.</value></data>
+  <data name="This link has already been used." xml:space="preserve"><value>Це посилання вже використано.</value></data>
+  <data name="This link has expired." xml:space="preserve"><value>Термін дії посилання минув.</value></data>
+  <data name="This link is invalid." xml:space="preserve"><value>Посилання недійсне.</value></data>
+  <data name="Invalid email or password." xml:space="preserve"><value>Неправильний email або пароль.</value></data>
+  <data name="Your session has expired. Please sign in again." xml:space="preserve"><value>Сесія завершилась. Увійдіть знову.</value></data>
+  <data name="Please confirm your email address before signing in." xml:space="preserve"><value>Підтвердьте email перед входом.</value></data>
+  <data name="This account has been suspended." xml:space="preserve"><value>Цей акаунт заблоковано.</value></data>
+  <data name="Too many failed sign-in attempts. Try again later." xml:space="preserve"><value>Забагато невдалих спроб входу. Спробуйте пізніше.</value></data>
+  <data name="This username is already taken." xml:space="preserve"><value>Це ім'я користувача вже зайняте.</value></data>
+  <data name="Message must not be empty." xml:space="preserve"><value>Повідомлення не може бути порожнім.</value></data>
+  <data name="Message must be at most 4000 characters." xml:space="preserve"><value>Повідомлення може містити щонайбільше 4000 символів.</value></data>
+  <data name="Message contains forbidden control characters." xml:space="preserve"><value>Повідомлення містить заборонені керівні символи.</value></data>
+  <data name="Display name must be 1-64 characters." xml:space="preserve"><value>Відображуване ім'я має містити 1–64 символи.</value></data>
+  <data name="Display name contains forbidden control characters." xml:space="preserve"><value>Відображуване ім'я містить заборонені символи.</value></data>
+  <data name="Username must be 3-32 characters: a-z, 0-9, '_' or '.'." xml:space="preserve"><value>Ім'я користувача: 3–32 символи з a-z, 0-9, '_' або '.'.</value></data>
+  <data name="Password must be at least 10 characters." xml:space="preserve"><value>Пароль має містити щонайменше 10 символів.</value></data>
+  <data name="Password must be at most 72 bytes." xml:space="preserve"><value>Пароль може містити щонайбільше 72 байти.</value></data>
+  <data name="Group title must be 1-100 characters." xml:space="preserve"><value>Назва групи має містити 1–100 символів.</value></data>
+  <data name="Group title contains forbidden control characters." xml:space="preserve"><value>Назва групи містить заборонені символи.</value></data>
+  <data name="Email is required." xml:space="preserve"><value>Вкажіть email.</value></data>
+  <data name="Email is not valid." xml:space="preserve"><value>Неправильний формат email.</value></data>
+  <data name="Password is required." xml:space="preserve"><value>Вкажіть пароль.</value></data>
+  <data name="Username is required." xml:space="preserve"><value>Вкажіть ім'я користувача.</value></data>
+  <data name="Display name is required." xml:space="preserve"><value>Вкажіть відображуване ім'я.</value></data>
+  <data name="Group title is required." xml:space="preserve"><value>Вкажіть назву групи.</value></data>
+  <data name="Token is required." xml:space="preserve"><value>Відсутній токен.</value></data>
+  <data name="A group needs at least 3 members including you." xml:space="preserve"><value>У групі має бути щонайменше 3 учасники разом з вами.</value></data>
+  <data name="A group can have at most 200 members." xml:space="preserve"><value>У групі може бути щонайбільше 200 учасників.</value></data>
+  <data name="Only the author can edit a message." xml:space="preserve"><value>Редагувати повідомлення може лише автор.</value></data>
+  <data name="Only the author can delete a message." xml:space="preserve"><value>Видалити повідомлення може лише автор.</value></data>
+  <data name="A deleted message cannot be edited." xml:space="preserve"><value>Видалене повідомлення не можна редагувати.</value></data>
+  <data name="Messages can only be edited within 48 hours." xml:space="preserve"><value>Повідомлення можна редагувати лише протягом 48 годин.</value></data>
+  <data name="Only groups can be left. Clear a personal chat instead." xml:space="preserve"><value>Вийти можна лише з групи. Особистий чат можна очистити.</value></data>
+  <data name="Only personal chats can be cleared. Leave a group instead." xml:space="preserve"><value>Очистити можна лише особистий чат. З групи можна вийти.</value></data>
+  <data name="This action is only available in groups." xml:space="preserve"><value>Ця дія доступна лише в групах.</value></data>
+  <data name="This group has been deleted." xml:space="preserve"><value>Цю групу видалено.</value></data>
+  <data name="You cannot remove this member." xml:space="preserve"><value>Ви не можете видалити цього учасника.</value></data>
+  <data name="Ownership cannot be assigned directly." xml:space="preserve"><value>Роль власника не можна призначити напряму.</value></data>
+  <data name="The owner's role cannot be changed." xml:space="preserve"><value>Роль власника не можна змінити.</value></data>
+  <data name="Current password is incorrect." xml:space="preserve"><value>Поточний пароль неправильний.</value></data>
+  <data name="Password is incorrect." xml:space="preserve"><value>Пароль неправильний.</value></data>
+  <data name="Administrator role required." xml:space="preserve"><value>Потрібна роль адміністратора.</value></data>
+  <data name="Administrators cannot be suspended." xml:space="preserve"><value>Адміністраторів не можна заблокувати.</value></data>
+  <data name="You cannot suspend your own account." xml:space="preserve"><value>Не можна заблокувати власний акаунт.</value></data>
+  <data name="An account with this email already exists. Sign in with your password and link the provider in settings." xml:space="preserve"><value>Акаунт з цим email уже існує. Увійдіть паролем і прив'яжіть провайдера в налаштуваннях.</value></data>
+  <data name="The provider did not share a usable email address." xml:space="preserve"><value>Провайдер не надав придатної email-адреси.</value></data>
+  <data name="This provider account is linked to another user." xml:space="preserve"><value>Цей акаунт провайдера прив'язано до іншого користувача.</value></data>
+  <data name="Search text must be 2-64 characters." xml:space="preserve"><value>Текст пошуку має містити 2–64 символи.</value></data>
+  <data name="Search text must be 2-200 characters." xml:space="preserve"><value>Текст пошуку має містити 2–200 символів.</value></data>
+  <data name="Use either 'before' or 'after', not both." xml:space="preserve"><value>Використовуйте або 'before', або 'after', але не обидва.</value></data>
+  <data name="Only the author can see the edit history." xml:space="preserve"><value>Історію редагувань бачить лише автор.</value></data>
+  <data name="Only the author can see message info." xml:space="preserve"><value>Інформацію про повідомлення бачить лише автор.</value></data>
+  <data name="Acknowledge at most 200 messages at once." xml:space="preserve"><value>Можна підтвердити щонайбільше 200 повідомлень за раз.</value></data>
+  <data name="Add at most 50 users at once." xml:space="preserve"><value>Можна додати щонайбільше 50 користувачів за раз.</value></data>
+  <data name="Choose at least one user." xml:space="preserve"><value>Оберіть хоча б одного користувача.</value></data>
+  <data name="Role must be 'Admin' or 'Member'." xml:space="preserve"><value>Роль має бути 'Admin' або 'Member'.</value></data>
+  <data name="Some users do not exist or cannot be added." xml:space="preserve"><value>Деяких користувачів не існує або їх не можна додати.</value></data>
+  <data name="clientMessageId is required." xml:space="preserve"><value>Потрібен clientMessageId.</value></data>
+  <data name="You cannot start a chat with yourself." xml:space="preserve"><value>Не можна почати чат із самим собою.</value></data>
+  <data name="This clientMessageId was already used in another conversation." xml:space="preserve"><value>Цей clientMessageId уже використано в іншій розмові.</value></data>
+  <data name="This conversation has been deleted." xml:space="preserve"><value>Цю розмову видалено.</value></data>
+  <data name="This account has been deleted." xml:space="preserve"><value>Цей акаунт видалено.</value></data>
+  <data name="The message you are replying to is not available." xml:space="preserve"><value>Повідомлення, на яке ви відповідаєте, недоступне.</value></data>
+  <data name="At most 10 attachments are allowed." xml:space="preserve"><value>Можна додати щонайбільше 10 вкладень.</value></data>
+  <data name="File name is not valid." xml:space="preserve"><value>Неприпустима назва файлу.</value></data>
+  <data name="Content type is not valid." xml:space="preserve"><value>Неприпустимий тип вмісту.</value></data>
+  <data name="Endpoint must be an absolute https URL." xml:space="preserve"><value>Endpoint має бути абсолютною https-адресою.</value></data>
+  <data name="Check your inbox to confirm your email address." xml:space="preserve"><value>Перевірте пошту, щоб підтвердити email.</value></data>
+  <data name="If the address can receive email, a message is on its way." xml:space="preserve"><value>Якщо адреса може отримувати пошту, лист уже в дорозі.</value></data>
+  <data name="Cross-site request rejected." xml:space="preserve"><value>Міжсайтовий запит відхилено.</value></data>
+  <data name="No API endpoint matches this path." xml:space="preserve"><value>Такого ендпоінта API не існує.</value></data>
+  <data name="Rate limit exceeded. Retry after the time given in the Retry-After header." xml:space="preserve"><value>Забагато запитів. Повторіть після часу з заголовка Retry-After.</value></data>
+  <data name="The service is temporarily unavailable. Please retry shortly." xml:space="preserve"><value>Сервіс тимчасово недоступний. Спробуйте трохи згодом.</value></data>
+  <data name="The resource was modified concurrently. Please retry." xml:space="preserve"><value>Дані змінилися одночасно з вашим запитом. Спробуйте ще раз.</value></data>
+  <data name="An unexpected error occurred." xml:space="preserve"><value>Сталася неочікувана помилка.</value></data>
+  <data name="Request body is not valid JSON." xml:space="preserve"><value>Тіло запиту не є коректним JSON.</value></data>
+  <data name="The {0} field is required." xml:space="preserve"><value>Поле {0} обов'язкове.</value></data>
+  <data name="Bad request" xml:space="preserve"><value>Некоректний запит</value></data>
+  <data name="Unauthorized" xml:space="preserve"><value>Потрібна автентифікація</value></data>
+  <data name="Forbidden" xml:space="preserve"><value>Доступ заборонено</value></data>
+  <data name="Not found" xml:space="preserve"><value>Не знайдено</value></data>
+  <data name="Conflict" xml:space="preserve"><value>Конфлікт</value></data>
+  <data name="Gone" xml:space="preserve"><value>Більше недоступно</value></data>
+  <data name="Validation failed" xml:space="preserve"><value>Помилка перевірки даних</value></data>
+  <data name="Too many requests" xml:space="preserve"><value>Забагато запитів</value></data>
+  <data name="Service unavailable" xml:space="preserve"><value>Сервіс недоступний</value></data>
+  <data name="Server error" xml:space="preserve"><value>Помилка сервера</value></data>
+  <data name="Search text contains forbidden control characters." xml:space="preserve"><value>Текст пошуку містить заборонені керівні символи.</value></data>
+</root>
