@@ -30,4 +30,13 @@ test('unread messages are summarized from the opened chat', async ({ browser }) 
   await bob.getByRole('button', { name: 'Підсумувати' }).click()
   await expect(bob.getByText('- Fake summary of 2 message(s).')).toBeVisible()
   await expect(bob.getByText(/Створено ШІ/)).toBeVisible()
+
+  // Leave the chat and come back right away (the per-conversation cache is still "fresh" for 15 s and says 2 unread):
+  // everything is read now, so there is nothing to offer and the old summary is gone with the visit.
+  await bob.getByRole('link', { name: `@${bobName}` }).click() // settings page
+  await expect(bob.getByRole('heading', { name: 'Підсумувати' })).toHaveCount(0)
+  await bob.getByRole('link', { name: new RegExp(`E2E ${aliceName}`) }).click()
+  await expect(bob.locator('.bubble-text', { hasText: 'Хто здає разом?' })).toBeVisible()
+  await expect(bob.getByRole('button', { name: 'Підсумувати' })).toHaveCount(0)
+  await expect(bob.getByText('- Fake summary of 2 message(s).')).toHaveCount(0)
 })
