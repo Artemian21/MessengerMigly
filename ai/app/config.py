@@ -1,11 +1,18 @@
+from pathlib import Path
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# The repository's root `.env` (git-ignored; the template is `.env.example`). Resolved from this file, not from the working
+# directory, so the service finds it wherever it is started. The file also holds settings for the .NET API; those are ignored.
+# In the container there is no such file: the settings come from real environment variables.
+ENV_FILE = Path(__file__).resolve().parents[2] / ".env"
+
 
 class Settings(BaseSettings):
-    """Configuration from environment variables (or a local `.env`). Secrets never have defaults."""
+    """Configuration from environment variables (or the root `.env`). Secrets never have defaults."""
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=ENV_FILE, extra="ignore")
 
     # Required on purpose: no silent fallback to the fake provider in production.
     ai_provider: str

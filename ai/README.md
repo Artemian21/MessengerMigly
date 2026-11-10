@@ -21,7 +21,7 @@ python -m venv .venv
 .venv/Scripts/python -m pip install -r requirements-dev.txt     # Linux/macOS: .venv/bin/python
 ```
 
-Configure through environment variables or an `ai/.env` file (see the AI_* block in the root `.env.example`), then:
+Configure through environment variables or the repository's root `.env` (copy `.env.example`, fill in the AI_* block; the file is found from any working directory), then:
 
 ```bash
 AI_PROVIDER=fake AI_SHARED_SECRET=0123456789abcdef .venv/Scripts/python -m uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8000

@@ -54,3 +54,21 @@ def test_settings_require_provider_and_secret():
         Settings(_env_file=None, ai_shared_secret="x" * 16)  # no AI_PROVIDER
     with pytest.raises(Exception):
         Settings(_env_file=None, ai_provider="fake", ai_shared_secret="short")
+
+
+def test_settings_read_the_repository_root_env_file_and_ignore_the_dotnet_keys(tmp_path):
+    from app.config import ENV_FILE
+
+    # the configured file really is at the repository root (next to the ai/ folder), whatever the working directory is
+    assert (ENV_FILE.parent / "ai" / "app" / "config.py").exists() and ENV_FILE.name == ".env"
+
+    env = tmp_path / ".env"
+    env.write_text(
+        "AI_PROVIDER=gemini\nGEMINI_API_KEY=k\nAI_SHARED_SECRET=0123456789abcdef\n"
+        "Jwt__Secret=for-the-dotnet-api\nConnectionStrings__Default=Host=x\nAi__Enabled=true\n",
+        encoding="utf-8",
+    )
+
+    settings = Settings(_env_file=env)
+
+    assert (settings.ai_provider, settings.gemini_api_key) == ("gemini", "k")
