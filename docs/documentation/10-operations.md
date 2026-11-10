@@ -20,7 +20,13 @@ ASP.NET Core maps `Section__Key` environment variables to `Section:Key`. `.env.e
 | `Authentication__Google__ClientId/ClientSecret`, `Authentication__GitHub__…` | empty | OAuth (provider hidden when empty) |
 | `App__PublicBaseUrl` | `http://localhost:5000` (Dev: `:5173`) | Base URL in email links |
 | `ForwardedHeaders__TrustProxy` | false | `true` behind Render's proxy (real client IPs) |
-| `RateLimiting__GlobalPerMinute/AuthPerMinute/SendBurst/SendPerMinute` | 60 / 10 / 10 / 30 | Rate limits |
+| `RateLimiting__GlobalPerMinute/AuthPerMinute/SendBurst/SendPerMinute/SummaryPerMinute` | 60 / 10 / 10 / 30 / 5 | Rate limits |
+| `AI_PROVIDER`, `AI_MODEL`, `GEMINI_API_KEY` / `ANTHROPIC_API_KEY` | — / provider default / — | Python service only: model backend (`gemini`, `anthropic`, `fake`). Locally read from the root `.env`; `AI_SHARED_SECRET` defaults to `Ai__SharedSecret` in the container |
+| `Ai__Enabled` | false | AI summary on/off (off → the summary endpoints answer 404) |
+| `Ai__BaseUrl` | `http://127.0.0.1:8000` | Python service (`ai/`) |
+| `Ai__SharedSecret` | — (≥ 16 chars when enabled; startup fails otherwise) | Sent as `X-Ai-Secret`; must equal `AI_SHARED_SECRET` of the Python service |
+| `Ai__TimeoutSeconds` / `Ai__MaxMessages` / `Ai__MinMessages` | 30 / 300 / 2 | HTTP timeout to the service; most unread messages per summary; fewer unread than the minimum → status `empty`, no LLM call |
+| `Ai__JobTtlMinutes` / `Ai__MaxConcurrency` / `Ai__QueueCapacity` | 15 / 2 / 50 | Job retention, parallel summaries, queue size |
 | `Presence__GraceSeconds` | 7 | Delay before "offline" |
 | `Database__MigrateOnStartup` | true | Apply migrations at start |
 | `Cors__AllowedOrigins` | empty | Only for a cross-origin front end |
@@ -37,7 +43,7 @@ cd client && npm install && npm run dev
 `.claude/launch.json` defines `api` and `client` preview servers for the desktop app.
 
 ## Docker image (`Dockerfile`)
-Three stages: Node 22 builds the SPA → .NET 9 SDK publishes the API → ASP.NET 9 runtime image with the SPA copied to `wwwroot`. Runs as the non-root `app` user, listens on `$PORT` (default 10000), healthcheck on `/health`. `.dockerignore` keeps `node_modules`, `bin`, `obj`, docs and local files out of the context.
+Three stages: Node 22 builds the SPA → .NET 9 SDK publishes the API → ASP.NET 9 runtime image with the SPA copied to `wwwroot`. Runs as the non-root `app` user, listens on `$PORT` (default 10000), healthcheck on `/health`. The image also contains Python with its own virtualenv (`/opt/ai-venv`) and `ai/app`; `docker/entrypoint.sh` (the `CMD`) starts the AI service on `127.0.0.1:8000` when `Ai__Enabled=true`, waits for its `/health` (30 s), then runs the API as PID 1. A misconfigured service (unknown `AI_PROVIDER`, missing key) stops the container at startup with a clear message. One secret serves both sides: the entrypoint exports `AI_SHARED_SECRET` from `Ai__SharedSecret`. Memory is tight on the free plan; set `Ai__Enabled=false` to run without the service. `.dockerignore` keeps `node_modules`, `bin`, `obj`, docs and local files out of the context.
 
 ```bash
 docker build -t messenger .
@@ -50,8 +56,9 @@ docker run --rm -p 10000:10000 --add-host=host.docker.internal:host-gateway \
 Runs on every push and pull request:
 1. **server** — restore, `dotnet build -c Release`, `dotnet test` (Testcontainers uses Docker on `ubuntu-latest`), uploads results.
 2. **client** — `npm ci`, lint, tests, build.
-3. **docker** — builds the image (after server and client pass).
-4. **secrets** — gitleaks (`.gitleaks.toml` allowlists local development defaults only).
+3. **ai** — Python 3.13, `pip install -r requirements-dev.txt`, `pytest`.
+4. **docker** — builds the image (after server, client and ai pass).
+5. **secrets** — gitleaks (`.gitleaks.toml` allowlists local development defaults only).
 
 Render auto-deploys after checks pass (`autoDeployTrigger: checksPass` in `render.yaml`).
 

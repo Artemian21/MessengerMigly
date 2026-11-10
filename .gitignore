@@ -21,3 +21,8 @@ node_modules/
 # Stray files from the original scaffold at the repository root (the real client lives in client/)
 /package.json
 /package-lock.json
+
+# Python AI service
+ai/.venv/
+__pycache__/
+.pytest_cache/

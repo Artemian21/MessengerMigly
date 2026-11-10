@@ -2,6 +2,7 @@ import { api } from './http'
 import { useLocale } from '../i18n'
 import type {
   AdminUser,
+  AiConfig,
   AuditEntry,
   AuthResponse,
   Conversation,
@@ -16,6 +17,7 @@ import type {
   PublicUser,
   SearchHit,
   Session,
+  SummaryJob,
   UserSummary,
 } from './types'
 
@@ -94,6 +96,14 @@ export const conversationsApi = {
     api<{ lastReadSequence: number }>(`${v1}/conversations/${id}/read`, { method: 'POST', body: { upToSequence } }),
   statuses: (id: string, fromSequence: number) =>
     api<MessageStatusItem[]>(`${v1}/conversations/${id}/statuses${q({ fromSequence })}`),
+  /** Starts a summary of the messages after `afterSequence` (default: after my read position). */
+  startSummary: (id: string, afterSequence?: number) =>
+    api<SummaryJob>(`${v1}/conversations/${id}/summary${q({ afterSequence })}`, { method: 'POST' }),
+  summary: (id: string, jobId: string) => api<SummaryJob>(`${v1}/conversations/${id}/summary/${jobId}`),
+}
+
+export const aiApi = {
+  config: () => api<AiConfig>(`${v1}/ai/config`),
 }
 
 export const messagesApi = {

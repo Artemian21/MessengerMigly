@@ -26,6 +26,10 @@ public sealed class SignalRRealtimeNotifier(IHubContext<ChatHub> hub) : IRealtim
     public Task ConversationReadAsync(Guid userId, Guid conversationId, long lastReadSequence, CancellationToken ct) =>
         hub.Clients.User(userId.ToString()).SendAsync("ConversationRead", new { conversationId, lastReadSequence }, ct);
 
+    public Task SummaryCompletedAsync(Guid userId, Guid conversationId, Guid jobId, string status, string? summary, string? errorCode,
+        CancellationToken ct) =>
+        hub.Clients.User(userId.ToString()).SendAsync("SummaryCompleted", new { conversationId, jobId, status, summary, errorCode }, ct);
+
     private IClientProxy Users(IReadOnlyCollection<Guid> userIds) => hub.Clients.Users(userIds.Select(id => id.ToString()));
 }
 

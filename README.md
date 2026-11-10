@@ -40,7 +40,7 @@ dotnet run --project server/src/Messenger.Api --launch-profile http
 cd client && npm install && npm run dev
 ```
 
-Open http://localhost:5173 (Ukrainian by default; switch to English with the UK/EN control). Emails (verification, password reset) land in Mailpit at http://localhost:8025. Optional demo data (6 users incl. an admin, a group and three personal chats, password from `Seed:Password` — the Development default is `Migly-demo-2026`):
+Open http://localhost:5173 (Ukrainian by default; switch to English with the UK/EN control). Emails (verification, password reset) land in Mailpit at http://localhost:8025. Optional demo data (6 users incl. an admin, a group and five personal chats; Alice starts with unread messages — 5 from Bohdan, 2 from Dmytro, 1 from Iryna — so the unread badges and the AI summary can be tried at once; password from `Seed:Password` — the Development default is `Migly-demo-2026`):
 
 ```bash
 dotnet run --project server/src/Messenger.Api --launch-profile http -- seed

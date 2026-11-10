@@ -4,6 +4,7 @@ using Messenger.Api.Infrastructure;
 using Messenger.Application.Common;
 using Messenger.Application.Conversations;
 using Messenger.Application.Messages;
+using Messenger.Application.Summaries;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -128,6 +129,24 @@ public sealed class ConversationsController(ISender mediator) : ApiControllerBas
     [ProducesResponseType(typeof(IReadOnlyList<MessageStatusDto>), StatusCodes.Status200OK)]
     public Task<IActionResult> Statuses(Guid id, [FromQuery] long fromSequence, CancellationToken ct) =>
         Send(new GetStatusesQuery(id, fromSequence), ct);
+
+    [HttpPost("{id:guid}/summary"), EnableRateLimiting(RateLimitPolicies.Summary)]
+    [EndpointSummary("Summarize what I have not read (\"що я пропустив\")")]
+    [EndpointDescription("Starts a background summary of my unread messages (latest 300, my watermarks apply) and returns 202 with a jobId; the result arrives as the SummaryCompleted hub event and via GET. 200 with status \"empty\" when fewer than 2 messages are unread (Ai:MinMessages); an already running job is returned instead of a new one. `afterSequence` (optional) summarizes messages after that sequence instead of after my read position; the join/clear watermarks still apply. 404 when the AI summary is switched off.")]
+    [ProducesResponseType(typeof(SummaryJobDto), StatusCodes.Status202Accepted)]
+    [ProducesResponseType(typeof(SummaryJobDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public Task<IActionResult> StartSummary(Guid id, [FromQuery] long? afterSequence, CancellationToken ct) =>
+        Send(new StartSummaryQuery(id, afterSequence), job => job.Status == "empty" ? Ok(job) : Accepted(job), ct);
+
+    [HttpGet("{id:guid}/summary/{jobId:guid}")]
+    [EndpointSummary("Get a summary job")]
+    [EndpointDescription("status is pending, ready or failed (with errorCode). Jobs are kept for 15 minutes and are visible to their owner only.")]
+    [ProducesResponseType(typeof(SummaryJobDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public Task<IActionResult> GetSummary(Guid id, Guid jobId, CancellationToken ct) => Send(new GetSummaryQuery(id, jobId), ct);
 
     private IActionResult SentResult(SendMessageResult result) =>
         result.Created

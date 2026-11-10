@@ -12,6 +12,28 @@ public sealed class AuthOptions
     public bool RequireEmailVerification { get; set; } = true;
 }
 
+/// <summary>AI summary settings bound from configuration section "Ai" (plain object, registered as a singleton).</summary>
+public sealed class AiOptions
+{
+    public bool Enabled { get; set; }
+    public string BaseUrl { get; set; } = "http://127.0.0.1:8000";
+
+    /// <summary>Shared with the Python service (header X-Ai-Secret). Never logged.</summary>
+    public string SharedSecret { get; set; } = "";
+
+    /// <summary>Longer than the Python service's own timeout (20 s) so its 504 reaches us first.</summary>
+    public int TimeoutSeconds { get; set; } = 30;
+
+    public int MaxMessages { get; set; } = 300;
+
+    /// <summary>Fewer unread messages than this are not worth a paid LLM call: the answer is "empty".</summary>
+    public int MinMessages { get; set; } = 2;
+
+    public int JobTtlMinutes { get; set; } = 15;
+    public int MaxConcurrency { get; set; } = 2;
+    public int QueueCapacity { get; set; } = 50;
+}
+
 /// <summary>Public base URL used in email links (App:PublicBaseUrl).</summary>
 public sealed class AppOptions
 {
