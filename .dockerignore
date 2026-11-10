@@ -1,0 +1,13 @@
+**/node_modules
+**/bin
+**/obj
+**/.vs
+client/dist
+.git
+.github
+.scaffold-backup
+docs
+e2e
+.env
+.env.*
+!.env.example

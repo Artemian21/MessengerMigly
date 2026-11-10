@@ -1,0 +1,37 @@
+# Render Blueprint (doc 02 §12). Secrets use `sync: false`: Render asks for them in the dashboard; they never live in git.
+services:
+  - type: web
+    name: messenger
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    branch: main
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__Default
+        sync: false
+      - key: Jwt__Secret
+        sync: false
+      - key: Jwt__AccessTtlMinutes
+        value: "12"
+      - key: Auth__RefreshTtlDays
+        value: "21"
+      - key: Email__Provider
+        value: Brevo
+      - key: Email__BrevoApiKey
+        sync: false
+      - key: Email__From
+        sync: false
+      - key: App__PublicBaseUrl
+        sync: false
+      - key: ForwardedHeaders__TrustProxy
+        value: "true"
+      # Optional, add them later in the Render dashboard (Environment tab) only when you have real values; an empty or
+      # placeholder value would switch the feature on with broken credentials:
+      #   Vapid__PublicKey, Vapid__PrivateKey, Vapid__Subject                       (Web Push)
+      #   Authentication__Google__ClientId / ClientSecret                           (Google sign-in)
+      #   Authentication__GitHub__ClientId / ClientSecret                           (GitHub sign-in)

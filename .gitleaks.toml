@@ -1,8 +1,10 @@
 # Development-only defaults (local docker-compose password, dev JWT fallback, demo seed password) are not real credentials.
+# Also allowed: the placeholder password used in README/curl examples, requests.http and OpenAPI samples.
+# Keep to the plain [allowlist] form: the CI pins gitleaks 8.24.3, which predates [[allowlists]] / regexTarget.
 [extend]
 useDefault = true
 
 [allowlist]
-description = "Local development defaults"
+description = "Local development defaults and documentation example password"
 paths = ['''server/src/Messenger.Api/appsettings\.Development\.json''', '''docker-compose\.yml''', '''\.env\.example''']
-regexes = ['''development-only-secret-change-me-0123456789abcdef''']
+regexes = ['''development-only-secret-change-me-0123456789abcdef''', '''S3cure-pass-123''']
