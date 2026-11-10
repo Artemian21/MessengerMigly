@@ -30,6 +30,18 @@ services:
         sync: false
       - key: ForwardedHeaders__TrustProxy
         value: "true"
+      # AI summary ("що я пропустив"). The Python service runs inside this container (docker/entrypoint.sh) and needs
+      # more memory than the free plan comfortably gives: if the instance restarts under load, set Ai__Enabled to "false".
+      - key: Ai__Enabled
+        value: "true"
+      - key: Ai__SharedSecret
+        generateValue: true
+      - key: AI_PROVIDER
+        value: gemini
+      - key: AI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: GEMINI_API_KEY
+        sync: false
       # Optional, add them later in the Render dashboard (Environment tab) only when you have real values; an empty or
       # placeholder value would switch the feature on with broken credentials:
       #   Vapid__PublicKey, Vapid__PrivateKey, Vapid__Subject                       (Web Push)

@@ -11,3 +11,9 @@ e2e
 .env
 .env.*
 !.env.example
+ai/.venv
+ai/tests
+**/__pycache__
+**/.pytest_cache
+**/.env
+**/appsettings.*.local.json
