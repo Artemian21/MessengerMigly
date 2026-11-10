@@ -31,12 +31,27 @@ test('unread messages are summarized from the opened chat', async ({ browser }) 
   await expect(bob.getByText('- Fake summary of 2 message(s).')).toBeVisible()
   await expect(bob.getByText(/Створено ШІ/)).toBeVisible()
 
-  // Leave the chat and come back right away (the per-conversation cache is still "fresh" for 15 s and says 2 unread):
-  // everything is read now, so there is nothing to offer and the old summary is gone with the visit.
+  const summary = bob.getByText('- Fake summary of 2 message(s).')
+  const lastMessage = bob.locator('.bubble-text', { hasText: 'Хто здає разом?' })
+
+  // The summary stays until it is closed. First through leaving the chat and coming back right away (everything is read
+  // now, so no new offer appears either: the per-conversation cache still says "2 unread" for 15 s, the list does not) ...
   await bob.getByRole('link', { name: `@${bobName}` }).click() // settings page
-  await expect(bob.getByRole('heading', { name: 'Підсумувати' })).toHaveCount(0)
   await bob.getByRole('link', { name: new RegExp(`E2E ${aliceName}`) }).click()
-  await expect(bob.locator('.bubble-text', { hasText: 'Хто здає разом?' })).toBeVisible()
+  await expect(lastMessage).toBeVisible()
+  await expect(summary).toBeVisible()
   await expect(bob.getByRole('button', { name: 'Підсумувати' })).toHaveCount(0)
-  await expect(bob.getByText('- Fake summary of 2 message(s).')).toHaveCount(0)
+
+  // ... then through a page reload (kept in sessionStorage) ...
+  await bob.reload()
+  await expect(lastMessage).toBeVisible()
+  await expect(summary).toBeVisible()
+
+  // ... and closing it is final: the card is gone, nothing new is offered, and a reload does not bring it back.
+  await bob.getByRole('button', { name: 'Закрити' }).click()
+  await expect(summary).toHaveCount(0)
+  await expect(bob.getByRole('button', { name: 'Підсумувати' })).toHaveCount(0)
+  await bob.reload()
+  await expect(lastMessage).toBeVisible()
+  await expect(summary).toHaveCount(0)
 })
