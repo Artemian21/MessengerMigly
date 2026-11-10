@@ -64,10 +64,7 @@ function ChatView({ conversationId }: { conversationId: string }) {
 
   useEffect(() => {
     void realtime.openConversation(conversationId)
-    return () => {
-      void realtime.closeConversation(conversationId)
-      useSummaries.getState().clearSettled(conversationId) // a summary belongs to this visit; a running one is kept
-    }
+    return () => void realtime.closeConversation(conversationId)
   }, [conversationId])
 
   // STS-02: acknowledge what this device received on first load.
@@ -171,6 +168,7 @@ function ChatView({ conversationId }: { conversationId: string }) {
   const clearChat = async () => {
     if (!confirm(t('chat.confirmDeleteChat'))) return
     await conversationsApi.clear(conversationId)
+    useSummaries.getState().clear(conversationId) // a summary must not outlive the history it was made from
     await queryClient.invalidateQueries({ queryKey: conversationsKey })
     queryClient.removeQueries({ queryKey: messagesKey(conversationId) })
     navigate('/')

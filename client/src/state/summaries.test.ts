@@ -19,6 +19,7 @@ describe('summaries store', () => {
       summary: '- decided',
       messageCount: 12,
       truncated: true,
+      at: expect.any(String),
     })
   })
 
@@ -41,15 +42,14 @@ describe('summaries store', () => {
     expect(useSummaries.getState().byConversation.c2).toEqual({ status: 'empty' })
   })
 
-  it('keeps a running job when the chat is left, but drops finished results', () => {
-    useSummaries.getState().set('running', pending)
-    useSummaries.getState().set('done', { status: 'failed', errorCode: 'internal' })
+  it('keeps every result until it is cleared, one conversation at a time', () => {
+    useSummaries.getState().set('a', pending)
+    useSummaries.getState().set('b', { status: 'failed', errorCode: 'internal' })
 
-    useSummaries.getState().clearSettled('running')
-    useSummaries.getState().clearSettled('done')
+    useSummaries.getState().clear('b')
 
-    expect(useSummaries.getState().byConversation.running).toEqual(pending)
-    expect(useSummaries.getState().byConversation.done).toBeUndefined()
+    expect(useSummaries.getState().byConversation.a).toEqual(pending)
+    expect(useSummaries.getState().byConversation.b).toBeUndefined()
   })
 })
 
@@ -60,6 +60,15 @@ describe('viewFromJob', () => {
     expect(viewFromJob({ jobId: 'j', status: 'failed' })).toEqual({ status: 'failed', errorCode: 'internal' })
     expect(viewFromJob({ jobId: 'j', status: 'ready', summary: null })).toBeNull()
     expect(viewFromJob({ jobId: null, status: 'pending' })).toBeNull()
+    const now = new Date('2026-11-10T21:16:00Z')
+    expect(viewFromJob({ jobId: 'j', status: 'ready', summary: '- ok', messageCount: 5 }, now)).toEqual({
+      status: 'ready',
+      jobId: 'j',
+      summary: '- ok',
+      messageCount: 5,
+      truncated: false,
+      at: '2026-11-10T21:16:00.000Z',
+    })
   })
 })
 

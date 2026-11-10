@@ -279,5 +279,9 @@
   "summary.error.internal": "Не вдалося зробити підсумок.",
   "summary.error.busy": "Помічник зайнятий. Спробуйте за хвилину.",
   "summary.error.rate_limited": "Забагато запитів. Зачекайте хвилину.",
-  "summary.error.unavailable": "Підсумки зараз вимкнені."
+  "summary.error.unavailable": "Підсумки зараз вимкнені.",
+  "summary.meta_one": "{count} повідомлення · {time}",
+  "summary.meta_few": "{count} повідомлення · {time}",
+  "summary.meta_many": "{count} повідомлень · {time}",
+  "summary.meta_other": "{count} повідомлення · {time}"
 }

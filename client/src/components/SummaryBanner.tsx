@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { aiApi } from '../api/endpoints'
 import { useSummary } from '../hooks/useSummary'
+import { formatTime } from '../lib/format'
 import { toSummaryErrorCode } from '../lib/summary'
 import { useT } from '../i18n'
 
@@ -18,6 +19,11 @@ export function SummaryBanner({ conversationId, unread }: { conversationId: stri
   const config = useQuery({ queryKey: ['ai-config'], queryFn: aiApi.config, staleTime: Infinity, retry: false })
   const { view, start, dismiss } = useSummary(conversationId)
   const [hidden, setHidden] = useState(false)
+  // Closing a result must not bring the offer back during the same visit.
+  const close = () => {
+    dismiss()
+    setHidden(true)
+  }
 
   if (!config.data?.summaryEnabled) return null
   const offer = !view && !hidden && unread !== null && unread.count >= config.data.minMessages
@@ -56,8 +62,9 @@ export function SummaryBanner({ conversationId, unread }: { conversationId: stri
         <>
           <div className="summary-row">
             <h3 className="summary-title">{t('summary.title')}</h3>
+            <span className="faint summary-note">{t('summary.meta', { count: view.messageCount, time: formatTime(view.at) })}</span>
             <span className="spacer" />
-            <button className="btn small ghost icon" onClick={dismiss} aria-label={t('common.close')}>
+            <button className="btn small ghost icon" onClick={close} aria-label={t('common.close')}>
               ✕
             </button>
           </div>
@@ -79,7 +86,7 @@ export function SummaryBanner({ conversationId, unread }: { conversationId: stri
           <button className="btn small" onClick={() => void start(unread?.after)}>
             {t('summary.retry')}
           </button>
-          <button className="btn small ghost icon" onClick={dismiss} aria-label={t('common.close')}>
+          <button className="btn small ghost icon" onClick={close} aria-label={t('common.close')}>
             ✕
           </button>
         </div>
@@ -89,7 +96,7 @@ export function SummaryBanner({ conversationId, unread }: { conversationId: stri
         <div className="summary-row">
           <p className="summary-text">{t('summary.empty')}</p>
           <span className="spacer" />
-          <button className="btn small ghost icon" onClick={dismiss} aria-label={t('common.close')}>
+          <button className="btn small ghost icon" onClick={close} aria-label={t('common.close')}>
             ✕
           </button>
         </div>

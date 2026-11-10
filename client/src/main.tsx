@@ -2,10 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 import { useLocale } from './i18n'
+import { initSummaryPersistence } from './state/summaryStorage'
 import './styles/theme.css'
 import './styles/app.css'
 
 document.documentElement.lang = useLocale.getState().locale
+initSummaryPersistence()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

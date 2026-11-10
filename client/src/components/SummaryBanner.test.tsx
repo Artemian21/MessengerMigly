@@ -89,6 +89,36 @@ describe('SummaryBanner', () => {
     expect(screen.queryByText(hostile)).toBeNull()
   })
 
+  it('keeps the result when the chat is left and opened again, until it is closed', async () => {
+    startSummary.mockResolvedValue(job({ messageCount: 5 }))
+    const first = renderBanner()
+    await userEvent.click(await screen.findByRole('button', { name: 'Підсумувати' }))
+    await screen.findByRole('status')
+    act(() => useSummaries.getState().finished('c1', { jobId: 'job-1', status: 'ready', summary: '- decided' }))
+    expect(screen.getByText('- decided')).toBeInTheDocument()
+    expect(screen.getByText(/^5 повідомлень · /)).toBeInTheDocument() // size and time of the summary
+
+    first.unmount() // leave the chat ...
+    renderBanner(null) // ... and come back: nothing is unread any more
+
+    expect(await screen.findByText('- decided')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Підсумувати' })).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Закрити' }))
+    expect(screen.queryByText('- decided')).toBeNull()
+  })
+
+  it('does not offer the summary again right after it was closed', async () => {
+    startSummary.mockResolvedValue(job({ jobId: null, status: 'empty', messageCount: 0 }))
+    renderBanner()
+    await userEvent.click(await screen.findByRole('button', { name: 'Підсумувати' }))
+    await screen.findByText('Немає що підсумовувати.')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Закрити' }))
+
+    expect(screen.queryByRole('button', { name: 'Підсумувати' })).toBeNull()
+  })
+
   it('says when the summary covers only the latest messages', async () => {
     startSummary.mockResolvedValue(job({ messageCount: 300, truncated: true }))
     renderBanner()

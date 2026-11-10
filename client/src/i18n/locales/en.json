@@ -267,5 +267,7 @@
   "summary.error.internal": "Could not write the summary.",
   "summary.error.busy": "The assistant is busy. Try again in a minute.",
   "summary.error.rate_limited": "Too many requests. Wait a minute.",
-  "summary.error.unavailable": "Summaries are switched off."
+  "summary.error.unavailable": "Summaries are switched off.",
+  "summary.meta_one": "{count} message · {time}",
+  "summary.meta_other": "{count} messages · {time}"
 }
