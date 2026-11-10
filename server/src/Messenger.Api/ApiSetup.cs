@@ -49,6 +49,7 @@ public static class ApiSetup
         services.AddInfrastructure(configuration);
         services.AddSingleton(configuration.GetSection("Auth").Get<AuthOptions>() ?? new AuthOptions());
         services.AddSingleton(configuration.GetSection("App").Get<AppOptions>() ?? new AppOptions());
+        services.AddSingleton(ValidatedAiOptions(configuration));
 
         services.AddHttpContextAccessor();
         services.AddScoped<CurrentUser>();
@@ -188,6 +189,18 @@ public static class ApiSetup
     }
 
     /// <summary>Production refuses to start with a missing, short or development JWT secret.</summary>
+    /// <summary>Fails at startup, not on the first summary, when the AI feature is on without a usable shared secret.</summary>
+    private static AiOptions ValidatedAiOptions(IConfiguration configuration)
+    {
+        var options = configuration.GetSection("Ai").Get<AiOptions>() ?? new AiOptions();
+        if (options.Enabled && options.SharedSecret.Length < 16)
+        {
+            throw new InvalidOperationException("Ai:SharedSecret must be at least 16 characters when Ai:Enabled is true (see .env.example).");
+        }
+
+        return options;
+    }
+
     private static void ValidateSecrets(WebApplicationBuilder builder)
     {
         var secret = builder.Configuration["Jwt:Secret"];
