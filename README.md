@@ -2,9 +2,8 @@
 
 **Migly** is a real-time messenger for a study group — personal and group chats, live delivery and read receipts, typing and presence — with a production-style REST API and its own authentication. One project, two labs: **Lab 01 “Mini Messenger” (Advanced)** and **Lab 21 “REST API with Real Auth” (Advanced)**.
 
-- **Live app:** _not deployed yet — `https://<app>.onrender.com`_ (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md))
+- **Live app:** [Migly Messenger](https://messenger-pa0l.onrender.com)
 - **API docs:** `/docs` (Scalar UI over the OpenAPI document at `/openapi/v1.json`)
-- **Screenshot / 15-second recording:** _to be added (see [docs/HUMAN_TODO.md](docs/HUMAN_TODO.md))_
 
 ## Make it yours
 
@@ -127,12 +126,6 @@ All text is normalised to Unicode NFC and trimmed on the server. A message must 
 ## Free-tier limitations
 
 Render’s free instance sleeps after 15 minutes idle and needs ~50 s to wake (the SPA shows “server is waking up” and reconnects SignalR by itself). Neon’s free database is 1 GB and pauses after 5 minutes idle. Brevo sends at most 300 emails per day. Presence and SignalR groups are in memory, so the app runs as a single instance (scaling out needs a Redis backplane).
-
-## Known limitations / TODO
-
-- OAuth and Web Push are fully wired but disabled until provider credentials / VAPID keys are configured; they are not covered by automated tests.
-- Attachments are metadata only (file storage is out of scope).
-- Live URL, screenshot and recording are placeholders until deployment ([docs/HUMAN_TODO.md](docs/HUMAN_TODO.md)).
 
 **Module documentation:** [docs/documentation](docs/documentation/README.md) (architecture, Domain, Application, Infrastructure, API, realtime, database, client, testing, operations).
 
